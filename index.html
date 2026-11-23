@@ -153,6 +153,9 @@ select:focus-visible{outline:3px solid var(--violet); outline-offset:3px}
 .member p{margin:0; font-size:1rem; color:var(--muted); overflow-wrap:anywhere}
 .member p span{color:var(--ink); font-weight:800}
 .member .note{border-inline-start:3px solid var(--pink); padding-inline-start:8px}
+.del-btn{align-self:flex-start; margin-top:6px; font:inherit; font-size:.85rem; font-weight:800; cursor:pointer; background:#fff; color:#c4123f; border:2px solid #c4123f; border-radius:4px; padding:3px 12px}
+.del-btn.armed{background:#c4123f; color:#fff}
+.del-btn:disabled{opacity:.5; cursor:not-allowed}
 .badges{display:flex; flex-wrap:wrap; gap:6px; margin:2px 0 4px}
 .badge{display:inline-flex; align-items:center; gap:5px; font-size:.82rem; font-weight:800; background:var(--ink); color:#d8e2ff; border-radius:999px; padding:2px 11px 2px 9px; box-shadow:0 0 0 2px #d8e2ff inset}
 .badge::before{content:"★"; color:var(--yellow)}
@@ -617,6 +620,16 @@ body.setup-mode .wrap > section:not(#setup), body.setup-mode .wrap > .foot, body
         p.appendChild(line);
       });
       if(r.data.note) p.appendChild(el("p","note", String(r.data.note).slice(0,300)));
+      if(isOwner && dbRef && dbRef.deleteResponse){
+        var db_ = el("button","del-btn","احذف جوابه"); db_.type = "button";
+        var armed = false, armTimer = null;
+        db_.addEventListener("click", function(){
+          if(!armed){ armed = true; db_.classList.add("armed"); db_.textContent = "متأكد؟ اضغط مرة ثانية"; armTimer = setTimeout(function(){ armed = false; db_.classList.remove("armed"); db_.textContent = "احذف جوابه"; }, 4000); return; }
+          clearTimeout(armTimer); db_.disabled = true; db_.textContent = "لحظة...";
+          dbRef.deleteResponse(r.id).catch(function(){ db_.disabled = false; armed = false; db_.classList.remove("armed"); db_.textContent = "ما انحذف، جرّب مرة ثانية"; });
+        });
+        p.appendChild(db_);
+      }
       box.appendChild(p);
     });
   }
@@ -936,6 +949,10 @@ body.setup-mode .wrap > section:not(#setup), body.setup-mode .wrap > .foot, body
     var r = await fetch(url(path), {method:"PUT", headers:{"Content-Type":"application/json"}, body:JSON.stringify(val)});
     if(!r.ok) throw new Error("http " + r.status);
   }
+  async function fbDel(path){
+    var r = await fetch(url(path), {method:"DELETE"});
+    if(!r.ok) throw new Error("http " + r.status);
+  }
   async function fetchState(){ var j = await fbGet(""); return (j && typeof j === "object") ? j : {}; }
   function applyState(st){
     var rs = (st.responses && typeof st.responses === "object") ? st.responses : {};
@@ -946,6 +963,7 @@ body.setup-mode .wrap > section:not(#setup), body.setup-mode .wrap > .foot, body
   }
   var store = {
     saveMine: async function(data){ await fbPut("responses/" + encodeURIComponent(myId), data); applyState(await fetchState()); },
+    deleteResponse: async function(id){ if(!isOwner) throw new Error("not host"); await fbDel("responses/" + encodeURIComponent(id)); applyState(await fetchState()); },
     setPlan: async function(p){ if(!isOwner) throw new Error("not host"); await fbPut("plan", p); applyState(await fetchState()); }
   };
   async function poll(){ try{ applyState(await fetchState()); }catch(e){} }
