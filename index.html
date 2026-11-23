@@ -1,0 +1,1019 @@
+<!doctype html>
+<html lang="ar" dir="rtl"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>مهمة الطلعة</title>
+<meta name="description" content="وين ومتى وشو نسوّي؟ جاوب وشوف أجوبة الشلة لايف، والخطة تنحسم بالأصوات.">
+<meta property="og:title" content="مهمة الطلعة: يلا نطلع">
+<meta property="og:description" content="أربع مهمات بسيطة. جاوب وشوف أجوبة الشلة لايف.">
+<meta property="og:type" content="website">
+<meta property="og:image" content="preview.png">
+<meta property="og:image:width" content="1200"><meta property="og:image:height" content="630">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="theme-color" content="#7fe3ef">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='14' fill='%23ff3d8b'/%3E%3Ccircle cx='32' cy='38' r='16' fill='%23ffd400' stroke='%2314101c' stroke-width='4'/%3E%3Cpath d='M8 46h48' stroke='%2314101c' stroke-width='4'/%3E%3Cpath d='M14 54h36' stroke='%230bb5a8' stroke-width='4'/%3E%3C/svg%3E">
+<link rel="apple-touch-icon" href="apple-touch-icon.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cairo:wght@600;700;800;900&family=Tajawal:wght@500;700;800&display=swap" rel="stylesheet">
+<style>
+/* Layout: RTL "mission briefing" board in bright daylight. HUD strip, slanted title over a polaroid collage, four numbered mission cards each led by a tilted polaroid, a black "final mission" banner, leaderboard bars, crew list. Hard offset shadows instead of soft cards. Deliberately single-theme light. */
+:root{
+  color-scheme:light;
+  --sky:#7fe3ef; --sky2:#d9f7fb; --sand:#ffe7b8; --ink:#14101c; --paper:#fffdf8; --muted:#2e2838;
+  --pink:#ff3d8b; --orange:#ff8f1f; --teal:#0bb5a8; --yellow:#ffd400; --violet:#7a3cff;
+  --font-display:"Cairo","Segoe UI",Tahoma,system-ui,sans-serif;
+  --font-body:"Tajawal","Segoe UI",Tahoma,system-ui,sans-serif;
+}
+*{box-sizing:border-box}
+[hidden]{display:none!important}
+body{
+  direction:rtl; color:var(--ink); font-family:var(--font-body); font-size:18px; font-weight:500; line-height:1.7;
+  background-color:var(--sky2);
+  background-image:linear-gradient(180deg,var(--sky) 0, var(--sky2) 340px, var(--sand) 100%);
+  background-attachment:fixed;
+  padding-block:0 60px;
+  padding-left:max(16px, env(safe-area-inset-left,0px));
+  padding-right:max(16px, env(safe-area-inset-right,0px));
+}
+.wrap{max-width:760px; margin:0 auto; display:flex; flex-direction:column; gap:26px}
+
+.hud{
+  display:flex; justify-content:space-between; align-items:center; gap:12px; flex-wrap:wrap;
+  padding-top:16px; font-weight:800; font-size:.9rem;
+}
+.hud .pill{background:var(--ink); color:var(--paper); border-radius:6px; padding:4px 12px; display:inline-flex; gap:8px; align-items:center}
+.hud .stars{color:var(--yellow); letter-spacing:2px; font-size:1rem}
+.hud .clock{font-variant-numeric:tabular-nums; direction:ltr}
+
+.hero{display:grid; gap:18px}
+.title-wrap{position:relative}
+.eyebrow{display:inline-block; background:var(--yellow); color:var(--ink); font-weight:800; padding:2px 12px; border:2px solid var(--ink); transform:rotate(2deg); margin:0 0 6px}
+h1{
+  font-family:var(--font-display); font-weight:900; margin:0; line-height:1.2;
+  font-size:clamp(3.4rem, 17vw, 6.8rem);
+  color:var(--pink);
+  text-shadow:4px 4px 0 var(--ink);
+  transform:rotate(-4deg); transform-origin:100% 60%;
+}
+.lede{margin:10px 0 0; font-size:1.15rem; font-weight:700; max-width:42ch; color:var(--muted)}
+
+.collage{position:relative; height:230px; margin-top:6px}
+.polaroid{
+  position:absolute; background:var(--paper); padding:8px 8px 30px; border:2px solid var(--ink);
+  box-shadow:6px 6px 0 var(--ink); width:min(46%, 260px);
+}
+.polaroid svg{display:block; width:100%; height:auto; aspect-ratio:5/3; border:1.5px solid var(--ink)}
+.polaroid .cap{position:absolute; inset:auto 0 4px 0; text-align:center; font-family:var(--font-display); font-weight:800; font-size:1rem}
+.collage .p1{right:0; top:10px; transform:rotate(5deg); z-index:2}
+.collage .p2{left:50%; top:0; transform:translateX(-50%) rotate(-3deg); z-index:3}
+.collage .p3{left:0; top:24px; transform:rotate(-7deg); z-index:1}
+
+.card{
+  background:var(--paper); border:2.5px solid var(--ink); border-radius:4px; box-shadow:8px 8px 0 var(--ink);
+  padding:20px; display:flex; flex-direction:column; gap:14px; min-width:0;
+}
+.mission{display:grid; grid-template-columns:minmax(0,1fr); gap:16px}
+.mission .shot{background:var(--paper); padding:8px 8px 8px; border:2px solid var(--ink); box-shadow:5px 5px 0 var(--ink); transform:rotate(-1.5deg); max-width:100%}
+.mission:nth-of-type(even) .shot{transform:rotate(1.5deg)}
+.mission .shot svg{display:block; width:100%; height:auto; aspect-ratio:5/2; border:1.5px solid var(--ink)}
+.tag{display:inline-flex; align-items:center; gap:8px; align-self:flex-start; background:var(--ink); color:var(--yellow); font-weight:800; font-size:.85rem; padding:3px 12px; border-radius:3px}
+h2{font-family:var(--font-display); font-weight:800; font-size:clamp(1.8rem,7vw,2.3rem); line-height:1.25; margin:0}
+.hint{margin:-6px 0 0; color:var(--muted); font-size:1rem; font-weight:700}
+label.field{font-family:var(--font-display); font-weight:800; font-size:1.4rem}
+
+input[type=text],textarea{
+  width:100%; font:inherit; color:var(--ink); background:#fff; border:2px solid var(--ink); border-radius:4px;
+  padding:11px 14px; min-width:0;
+}
+textarea{resize:vertical; min-height:84px}
+input[type=text]:focus-visible,textarea:focus-visible,button:focus-visible{outline:3px solid var(--violet); outline-offset:3px}
+
+.chips{display:flex; flex-wrap:wrap; gap:10px}
+.chip{
+  font:inherit; font-weight:700; color:var(--ink); background:#fff; border:2px solid var(--ink); border-radius:4px;
+  padding:7px 14px; cursor:pointer; display:inline-flex; align-items:center; gap:8px;
+  box-shadow:3px 3px 0 var(--ink); transition:transform .1s ease, box-shadow .1s ease;
+}
+.chip:hover{transform:translate(-1px,-1px); box-shadow:4px 4px 0 var(--ink)}
+.chip:active{transform:translate(2px,2px); box-shadow:1px 1px 0 var(--ink)}
+.chip[aria-pressed="true"]{background:var(--pink); color:#fff}
+.chip .n{font-size:.78rem; min-width:1.6em; text-align:center; padding:0 6px; border-radius:3px; background:var(--ink); color:var(--yellow)}
+.chip .lbl2{font-size:.8rem; font-weight:800; color:#06786f}
+.chip[aria-pressed="true"] .lbl2{color:var(--yellow)}
+.add-row{display:flex; gap:10px}
+.btn{
+  font:inherit; font-weight:800; border:2px solid var(--ink); border-radius:4px; padding:10px 18px; cursor:pointer;
+  background:var(--yellow); color:var(--ink); box-shadow:3px 3px 0 var(--ink);
+}
+.btn:disabled{opacity:.5; cursor:not-allowed}
+.go{
+  font-family:var(--font-display); font-weight:800; font-size:1.8rem; line-height:1.2; padding:12px 20px; width:100%;
+  background:var(--teal); color:#fff; box-shadow:6px 6px 0 var(--ink); }
+.status{margin:0; min-height:1.5em; font-weight:700; color:var(--muted)}
+
+.final{background:var(--ink); color:var(--paper); box-shadow:8px 8px 0 var(--pink)}
+.final h2{color:var(--yellow)}
+.final .count{margin:0; font-weight:800; color:var(--sky)}
+.final .big{margin:0; font-family:var(--font-display); font-size:clamp(1.5rem,6vw,2.1rem); line-height:1.35}
+.final-grid{display:grid; grid-template-columns:repeat(auto-fit,minmax(150px,1fr)); gap:14px}
+.final-grid div{min-width:0; border-top:2px dashed color-mix(in srgb, var(--paper) 40%, transparent); padding-top:8px}
+.final-grid .k{margin:0; font-size:.85rem; font-weight:800; color:var(--sky)}
+.final-grid .v{margin:0; font-family:var(--font-display); font-size:1.45rem; line-height:1.3; overflow-wrap:anywhere}
+.head-row{display:flex; justify-content:space-between; align-items:baseline; gap:12px; flex-wrap:wrap}
+.final.locked{background:var(--teal); box-shadow:8px 8px 0 var(--ink)}
+.final.locked h2{color:var(--paper); text-shadow:3px 3px 0 var(--ink)}
+.final.locked .final-grid div{border-top-color:rgba(255,253,248,.6)}
+.final.locked .final-grid .k{color:var(--yellow)}
+.final .stamp{align-self:flex-start; margin:0; background:var(--yellow); color:var(--ink); border:2px solid var(--ink); font-weight:900; padding:2px 14px; transform:rotate(-3deg)}
+.final .see{margin:0; font-weight:800; font-size:1.05rem}
+.lockp{border-color:var(--ink); background:#fff6d6}
+.lock-grid{display:grid; grid-template-columns:repeat(auto-fit,minmax(200px,1fr)); gap:14px}
+.lock-grid label{display:flex; flex-direction:column; gap:6px; font-weight:800; min-width:0}
+select{width:100%; min-width:0; font:inherit; font-weight:700; color:var(--ink); background:#fff; border:2px solid var(--ink); border-radius:4px; padding:10px 12px}
+select:focus-visible{outline:3px solid var(--violet); outline-offset:3px}
+.lock-actions{display:flex; gap:10px; flex-wrap:wrap}
+.btn.lock{background:var(--pink); color:#fff; font-size:1.1rem}
+.btn.unlock{background:#fff}
+
+.board{display:flex; flex-direction:column; gap:22px}
+.blk{display:flex; flex-direction:column; gap:8px}
+.blk h3{margin:0; font-family:var(--font-display); font-weight:800; font-size:1.4rem}
+.row{display:grid; grid-template-columns:minmax(90px,34%) 1fr 2.2ch; gap:10px; align-items:center; font-weight:500}
+.row .lbl{overflow-wrap:anywhere}
+.track{height:16px; border:2px solid var(--ink); border-radius:3px; background:#fff; overflow:hidden}
+.fill{height:100%; background:var(--c); width:0; transition:width .4s ease}
+.cnt{font-weight:800; text-align:end; font-variant-numeric:tabular-nums}
+.empty{margin:0; color:var(--muted)}
+
+.crew{display:grid; grid-template-columns:repeat(auto-fill,minmax(220px,1fr)); gap:14px}
+.member{border:2px solid var(--ink); border-radius:4px; background:#fff; padding:12px 14px; display:flex; flex-direction:column; gap:4px; min-width:0}
+.member b{font-family:var(--font-display); font-weight:800; font-size:1.35rem}
+.member .you{font-size:.75rem; font-weight:800; background:var(--yellow); border:1.5px solid var(--ink); padding:0 8px; border-radius:3px; margin-inline-start:8px}
+.member p{margin:0; font-size:1rem; color:var(--muted); overflow-wrap:anywhere}
+.member p span{color:var(--ink); font-weight:800}
+.member .note{border-inline-start:3px solid var(--pink); padding-inline-start:8px}
+.badges{display:flex; flex-wrap:wrap; gap:6px; margin:2px 0 4px}
+.badge{display:inline-flex; align-items:center; gap:5px; font-size:.82rem; font-weight:800; background:var(--ink); color:#d8e2ff; border-radius:999px; padding:2px 11px 2px 9px; box-shadow:0 0 0 2px #d8e2ff inset}
+.badge::before{content:"★"; color:var(--yellow)}
+.nudge{background:var(--yellow); box-shadow:8px 8px 0 var(--ink)}
+.nudge textarea{background:#fff; min-height:110px; font-weight:700}
+.nudge .row2{display:flex; gap:10px; flex-wrap:wrap}
+.btn.big{font-size:1.15rem; background:var(--pink); color:#fff; padding:12px 22px}
+.badge-key{margin:0 0 4px; display:flex; flex-wrap:wrap; gap:6px 14px; font-size:.88rem; font-weight:700; color:var(--muted)}
+.badge-key b{color:var(--ink)}
+
+.foot{margin:0; text-align:center; font-weight:700; color:var(--muted)}
+
+#confetti{position:fixed; inset:0; width:100%; height:100%; pointer-events:none; z-index:40}
+.ach{
+  position:fixed; z-index:50; left:50%; top:calc(env(safe-area-inset-top,0px) + 14px);
+  width:min(440px, calc(100% - 32px)); transform:translate(-50%, -160%);
+  display:flex; align-items:center; gap:14px; direction:rtl;
+  background:linear-gradient(135deg,#1c1830,#2b2448); color:#fffdf8;
+  border:2px solid #d8e2ff; border-radius:16px; padding:12px 16px;
+  box-shadow:0 0 0 4px rgba(216,226,255,.18), 0 18px 40px rgba(20,16,28,.45);
+  transition:transform .5s cubic-bezier(.2,1.4,.4,1);
+}
+.ach.show{transform:translate(-50%,0)}
+.ach .medal{flex:none; width:60px; height:60px; border-radius:50%; display:grid; place-items:center;
+  background:radial-gradient(circle at 35% 30%,#ffffff,#d8e2ff 40%,#8fa0d8 75%,#5b6aa8); box-shadow:0 0 22px rgba(216,226,255,.9)}
+.ach .medal svg{width:34px; height:34px}
+.ach .txt{min-width:0; display:flex; flex-direction:column}
+.ach .k{font-size:.8rem; font-weight:800; color:#b9c6f5; letter-spacing:.02em}
+.ach .t{font-family:var(--font-display); font-weight:900; font-size:1.25rem; line-height:1.3}
+.ach .d{font-size:.9rem; font-weight:600; color:#e4e0f0}
+.ach .shine{position:absolute; inset:0; border-radius:14px; overflow:hidden; pointer-events:none}
+.ach .shine::after{content:""; position:absolute; top:0; bottom:0; width:40%; left:-50%;
+  background:linear-gradient(100deg,transparent,rgba(255,255,255,.35),transparent); animation:sweep 1.6s ease .4s 1}
+@keyframes sweep{to{left:120%}}
+@media (prefers-reduced-motion: reduce){ .ach{transition:none} .ach .shine::after{animation:none} }
+
+@media (prefers-reduced-motion: reduce){ .chip,.fill{transition:none} .chip:hover,.chip:active{transform:none} }
+@media (max-width:520px){
+  .collage{height:190px}
+  .polaroid{width:52%; padding:6px 6px 26px}
+  .polaroid .cap{font-size:.9rem}
+  .card{padding:16px; box-shadow:6px 6px 0 var(--ink)}
+  .final{box-shadow:6px 6px 0 var(--pink)}
+  .row{grid-template-columns:minmax(80px,38%) 1fr 2.2ch}
+}
+body{margin:0}
+:root{padding-top:env(safe-area-inset-top,0px); padding-bottom:env(safe-area-inset-bottom,0px)}
+.site-bar{display:flex; align-items:center; justify-content:space-between; gap:12px; padding-top:14px}
+.brand{display:flex; align-items:center; gap:10px; font-family:var(--font-display); font-weight:900; font-size:1.25rem; color:var(--ink); text-decoration:none}
+.brand .mark{width:38px; height:38px; flex:none}
+.site-foot{display:flex; flex-direction:column; align-items:center; gap:6px; padding-top:10px; border-top:2.5px dashed var(--ink); text-align:center; font-weight:700; color:var(--muted)}
+.site-foot .brand{font-size:1.05rem}
+#setup ol{margin:0; padding-inline-start:22px; display:flex; flex-direction:column; gap:6px; font-weight:600}
+#setup code{direction:ltr; unicode-bidi:embed; background:rgba(255,253,248,.15); padding:0 6px; border-radius:3px}
+#setup .fb-row{display:flex; gap:10px; flex-wrap:wrap}
+#setup .fb-row input{flex:1 1 240px; direction:ltr; text-align:left}
+body.setup-mode .wrap > section:not(#setup), body.setup-mode .wrap > .foot, body.setup-mode .hud{display:none!important}
+#setup .linkbox{display:flex; gap:10px; flex-wrap:wrap}
+#setup .linkbox input{flex:1 1 240px; direction:ltr; text-align:left; font-size:.9rem}
+</style>
+</head><body>
+
+<canvas id="confetti" aria-hidden="true"></canvas>
+<div class="ach" id="ach" role="status" aria-live="polite" hidden>
+  <div class="medal" aria-hidden="true">
+    <svg viewBox="0 0 40 40"><path d="M12 6h16v8a8 8 0 0 1-16 0z" fill="#2b2448"/><path d="M12 9H6a6 6 0 0 0 6 7M28 9h6a6 6 0 0 1-6 7" fill="none" stroke="#2b2448" stroke-width="2.6" stroke-linecap="round"/><path d="M18 22h4v6h-4z" fill="#2b2448"/><rect x="12" y="28" width="16" height="5" rx="1.5" fill="#2b2448"/><path d="M20 8.5l1.3 2.7 3 .4-2.2 2 .6 3-2.7-1.5-2.7 1.5.6-3-2.2-2 3-.4z" fill="#ffffff"/></svg>
+  </div>
+  <div class="txt"><span class="k" id="ach-k">إنجاز بلاتيني انفتح</span><span class="t" id="ach-t"></span><span class="d" id="ach-d"></span></div>
+  <div class="shine"></div>
+</div>
+<div class="wrap">
+  <div class="site-bar"><a class="brand" href="./"><svg class="mark" viewBox="0 0 64 64" aria-hidden="true"><rect width="64" height="64" rx="14" fill="#ff3d8b" stroke="#14101c" stroke-width="3"/><circle cx="32" cy="38" r="16" fill="#ffd400" stroke="#14101c" stroke-width="4"/><path d="M8 46h48" stroke="#14101c" stroke-width="4"/><path d="M14 54h36" stroke="#0bb5a8" stroke-width="4"/></svg><span>طلعة الشلة</span></a></div>
+  <div class="hud" aria-hidden="true">
+    <span class="pill"><span class="stars">★★★★★</span> مستوى الحماس</span>
+    <span class="pill clock" id="clock">00:00</span>
+  </div>
+
+  <header class="hero">
+    <div class="title-wrap">
+      <p class="eyebrow">مهمة جديدة للشلة</p>
+      <h1>يلا نطلع</h1>
+      <p class="lede">أربع مهمات بسيطة: وين، أي يوم، أي وقت، وشو نسوّي. جاوب وشوف أجوبة الشلة لايف، والخطة تنحسم بالأصوات.</p>
+    </div>
+    <div class="collage" aria-hidden="true">
+      <figure class="polaroid p3" style="margin:0">
+        <svg viewBox="0 0 250 150"><rect width="250" height="150" fill="#ff8f1f"/><rect width="250" height="80" fill="#ffb15a"/><circle cx="170" cy="78" r="30" fill="#ffd400"/><rect y="86" width="250" height="64" fill="#0bb5a8"/><path d="M0 100h250M0 114h250M0 128h250" stroke="#d9f7fb" stroke-width="3" stroke-dasharray="20 14"/><path d="M40 150 C42 120 46 96 58 70" stroke="#14101c" stroke-width="6" fill="none" stroke-linecap="round"/><g stroke="#14101c" stroke-width="5" fill="none" stroke-linecap="round"><path d="M58 70c-14-12-30-10-42 2"/><path d="M58 70c-6-16-20-22-36-20"/><path d="M58 70c2-16 10-24 24-26"/><path d="M58 70c14-10 28-8 38 4"/></g></svg>
+        <figcaption class="cap">البحر</figcaption>
+      </figure>
+      <figure class="polaroid p2" style="margin:0">
+        <svg viewBox="0 0 250 150"><rect width="250" height="150" fill="#7a3cff"/><rect y="96" width="250" height="54" fill="#14101c"/><g fill="#14101c"><rect x="14" y="54" width="26" height="46"/><rect x="40" y="30" width="20" height="70"/><rect x="62" y="64" width="30" height="36"/><rect x="150" y="40" width="24" height="60"/><rect x="176" y="20" width="18" height="80"/><rect x="196" y="58" width="40" height="42"/></g><g fill="#ffd400"><rect x="46" y="40" width="4" height="4"/><rect x="46" y="56" width="4" height="4"/><rect x="182" y="32" width="4" height="4"/><rect x="182" y="52" width="4" height="4"/><rect x="204" y="68" width="4" height="4"/></g><rect x="96" y="22" width="52" height="30" rx="3" fill="#ff3d8b" stroke="#ffd400" stroke-width="3"/><path d="M106 116l20-10 22 10" stroke="#ffd400" stroke-width="3" fill="none"/><path d="M0 124h250" stroke="#ff3d8b" stroke-width="3" stroke-dasharray="16 12"/></svg>
+        <figcaption class="cap">السهرة</figcaption>
+      </figure>
+      <figure class="polaroid p1" style="margin:0">
+        <svg viewBox="0 0 250 150"><rect width="250" height="150" fill="#ffd9a0"/><circle cx="60" cy="40" r="22" fill="#ff8f1f"/><path d="M0 110 Q60 70 130 104 T250 96 V150 H0Z" fill="#f2a74b"/><path d="M0 128 Q80 96 160 124 T250 120 V150 H0Z" fill="#d9822b"/><g transform="translate(150 70)"><path d="M0 34 L28 0 L56 34Z" fill="#fffdf8" stroke="#14101c" stroke-width="3"/><path d="M28 0V34" stroke="#14101c" stroke-width="3"/></g><circle cx="118" cy="108" r="8" fill="#ff3d8b"/><path d="M114 100l4-8 4 8" stroke="#ffd400" stroke-width="3" fill="none"/></svg>
+        <figcaption class="cap">البر</figcaption>
+      </figure>
+    </div>
+  </header>
+
+  <section class="card final" id="setup" hidden>
+    <span class="tag" style="background:var(--yellow);color:var(--ink)">لصاحب الطلعة</span>
+    <h2>جهّز طلعة جديدة</h2>
+    <div id="fb-step" style="display:flex;flex-direction:column;gap:12px">
+      <p class="see">الخطوة الأولى: اربط الموقع بقاعدة بيانات مجانية من Google عشان تنحفظ أجوبة الشلة. تسوّيها مرة وحدة بس.</p>
+      <ol>
+        <li>ادخل <code>console.firebase.google.com</code> بحساب Google، واضغط Create a project. طفّي Analytics وكمّل.</li>
+        <li>من القائمة: Build ثم Realtime Database، واضغط Create Database.</li>
+        <li>اختر Belgium (europe-west1)، وبعدين Start in test mode، ثم Enable.</li>
+        <li>انسخ الرابط اللي يطلع فوق (ينتهي بـ <code>firebasedatabase.app</code>) والصقه هني.</li>
+      </ol>
+      <label class="field" for="fb-url" style="color:var(--yellow)">رابط قاعدة البيانات</label>
+      <div class="fb-row"><input type="text" id="fb-url" inputmode="url" autocomplete="off" placeholder="https://xxxx-default-rtdb.europe-west1.firebasedatabase.app"></div>
+    </div>
+    <button type="button" class="btn go" id="setup-btn">سوّ الطلعة</button>
+    <div id="setup-links" hidden style="display:flex;flex-direction:column;gap:14px">
+      <label class="field" for="friends-link" style="color:var(--yellow)">رابط الشلة (أرسله في القروب)</label>
+      <div class="linkbox"><input type="text" id="friends-link" readonly><button type="button" class="btn" id="copy-friends">انسخ</button></div>
+      <label class="field" for="host-link" style="color:var(--yellow)">رابطك إنت (لا ترسله لأحد)</label>
+      <div class="linkbox"><input type="text" id="host-link" readonly><button type="button" class="btn" id="copy-host">انسخ</button></div>
+      <button type="button" class="btn big" id="open-host">افتح صفحة الطلعة</button>
+    </div>
+    <p class="status" id="setup-status" role="status" style="color:var(--sky)"></p>
+  </section>
+
+  <section class="card final" aria-live="polite">
+    <div class="head-row"><h2 id="final-title">المهمة النهائية</h2><p class="count" id="plan-count"></p></div>
+    <div id="plan-body"></div>
+  </section>
+
+  <section class="card lockp" id="lock-panel" hidden>
+    <span class="tag">لصاحب الطلعة بس</span>
+    <h2>اقفل الخطة</h2>
+    <p class="hint">اختار النتيجة النهائية، وبعدين اقفلها عشان الشلة كلها تشوفها. المتصدّر مختار تلقائياً.</p>
+    <div class="lock-grid">
+      <label for="lk-places">وين<select id="lk-places"></select></label>
+      <label for="lk-dates">متى<select id="lk-dates"></select></label>
+      <label for="lk-times">الوقت<select id="lk-times"></select></label>
+      <label for="lk-acts">شو نسوّي<select id="lk-acts"></select></label>
+    </div>
+    <div class="lock-actions">
+      <button type="button" class="btn lock" id="lock-btn">اقفل الخطة</button>
+      <button type="button" class="btn unlock" id="unlock-btn" hidden>افتح الخطة من جديد</button>
+    </div>
+    <p class="status" id="lock-status" role="status"></p>
+  </section>
+
+  <section class="card">
+    <label class="field" for="name">منو إنت؟</label>
+    <input type="text" id="name" maxlength="40" autocomplete="given-name" placeholder="اكتب اسمك عشان الشلة تعرف منو جاوب">
+  </section>
+
+  <section class="card mission">
+    <div class="shot" aria-hidden="true">
+      <svg viewBox="0 0 500 200" preserveAspectRatio="xMidYMid slice">
+        <rect width="500" height="200" fill="#7fe3ef"/>
+        <circle cx="400" cy="56" r="34" fill="#ffd400" stroke="#14101c" stroke-width="3"/>
+        <path d="M0 120 C80 108 160 128 250 116 S420 108 500 120 V200 H0Z" fill="#0bb5a8" stroke="#14101c" stroke-width="3"/>
+        <path d="M30 140h80M180 134h70M330 142h90" stroke="#d9f7fb" stroke-width="4" stroke-linecap="round"/>
+        <path d="M0 168 C120 150 300 176 500 160 V200 H0Z" fill="#ffe7b8" stroke="#14101c" stroke-width="3"/>
+        <g transform="translate(250 96)" stroke="#14101c" stroke-width="3">
+          <rect x="0" y="0" width="64" height="30" fill="#ff3d8b"/>
+          <path d="M-6 0 L32 -22 L70 0Z" fill="#ffd400"/>
+          <path d="M6 30 L-4 74 M58 30 L68 74 M10 52 H54" fill="none"/>
+        </g>
+        <path d="M90 200 C92 160 96 120 112 80" stroke="#14101c" stroke-width="9" fill="none" stroke-linecap="round"/>
+        <g stroke="#14101c" stroke-width="7" fill="none" stroke-linecap="round">
+          <path d="M112 80c-18-16-40-14-58 4"/><path d="M112 80c-8-22-28-30-50-26"/><path d="M112 80c2-22 14-34 34-36"/><path d="M112 80c18-14 38-12 52 6"/><path d="M112 80c16 0 30 10 38 28"/>
+        </g>
+        <g transform="translate(190 160) rotate(-8)"><rect width="46" height="10" rx="5" fill="#ff8f1f" stroke="#14101c" stroke-width="2.5"/></g>
+      </svg>
+    </div>
+    <span class="tag">المهمة ١ من ٤</span>
+    <h2>وين نروح؟</h2>
+    <p class="hint">اختار كل الأماكن اللي تناسبك</p>
+    <div class="chips" id="g-places"></div>
+    <div class="add-row">
+      <input type="text" id="add-place" maxlength="40" placeholder="عندك مكان ثاني؟" aria-label="اقترح مكان ثاني">
+      <button type="button" class="btn" id="add-place-btn">زيد</button>
+    </div>
+  </section>
+
+  <section class="card mission">
+    <div class="shot" aria-hidden="true">
+      <svg viewBox="0 0 500 200" preserveAspectRatio="xMidYMid slice">
+        <rect width="500" height="200" fill="#ffd400"/>
+        <g stroke="#14101c" stroke-width="3" fill="none" opacity=".25"><path d="M0 40h500M0 80h500M0 120h500M0 160h500"/></g>
+        <g transform="translate(170 22) rotate(-4)">
+          <rect width="160" height="156" fill="#fffdf8" stroke="#14101c" stroke-width="3"/>
+          <rect width="160" height="38" fill="#ff3d8b" stroke="#14101c" stroke-width="3"/>
+          <circle cx="40" cy="0" r="7" fill="#14101c"/><circle cx="120" cy="0" r="7" fill="#14101c"/>
+          <text x="80" y="118" text-anchor="middle" font-family="Cairo, sans-serif" font-size="74" fill="#14101c">٢</text>
+          <path d="M18 132 q62 -18 124 0" stroke="#0bb5a8" stroke-width="4" fill="none"/>
+        </g>
+        <g transform="translate(60 58) rotate(-10)"><rect width="70" height="70" fill="#fffdf8" stroke="#14101c" stroke-width="3"/><rect width="70" height="18" fill="#0bb5a8" stroke="#14101c" stroke-width="3"/><text x="35" y="60" text-anchor="middle" font-family="Cairo, sans-serif" font-size="34" fill="#14101c">٢٧</text></g>
+        <g transform="translate(370 64) rotate(9)"><rect width="70" height="70" fill="#fffdf8" stroke="#14101c" stroke-width="3"/><rect width="70" height="18" fill="#7a3cff" stroke="#14101c" stroke-width="3"/><text x="35" y="60" text-anchor="middle" font-family="Cairo, sans-serif" font-size="34" fill="#14101c">٥</text></g>
+        <path d="M218 96 l12 -26 12 26 28 2 -22 18 8 28 -26 -16 -24 16 8 -28 -22 -18z" transform="translate(130 -40) scale(.55)" fill="#ff8f1f" stroke="#14101c" stroke-width="5"/>
+      </svg>
+    </div>
+    <span class="tag">المهمة ٢ من ٤</span>
+    <h2>أي يوم يناسبك؟</h2>
+    <p class="hint">علّم على كل يوم تقدر تطلع فيه</p>
+    <div class="chips" id="g-dates"></div>
+    <div class="add-row">
+      <input type="text" id="add-date" maxlength="40" placeholder="ما تقدر على هالأيام؟ اكتب اليوم اللي يناسبك" aria-label="اكتب يوم ثاني يناسبك">
+      <button type="button" class="btn" id="add-date-btn">زيد</button>
+    </div>
+  </section>
+
+  <section class="card mission">
+    <div class="shot" aria-hidden="true">
+      <svg viewBox="0 0 500 200" preserveAspectRatio="xMidYMid slice">
+        <defs><linearGradient id="hw" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#7a3cff"/><stop offset=".55" stop-color="#ff3d8b"/><stop offset="1" stop-color="#ff8f1f"/></linearGradient></defs>
+        <rect width="500" height="200" fill="url(#hw)"/>
+        <circle cx="250" cy="110" r="52" fill="#ffd400" stroke="#14101c" stroke-width="3"/>
+        <g fill="#14101c"><rect x="0" y="92" width="40" height="38"/><rect x="40" y="70" width="26" height="60"/><rect x="66" y="100" width="44" height="30"/><rect x="380" y="86" width="30" height="44"/><rect x="410" y="64" width="22" height="66"/><rect x="432" y="96" width="68" height="34"/></g>
+        <path d="M0 130 H500 V200 H0Z" fill="#14101c"/>
+        <path d="M250 130 L120 200 M250 130 L380 200" stroke="#ffd400" stroke-width="3"/>
+        <path d="M250 140 V150 M250 162 V176 M250 188 V200" stroke="#fffdf8" stroke-width="5"/>
+        <g transform="translate(176 150)">
+          <path d="M8 26 C10 12 24 6 40 4 L64 0 C80 0 96 8 104 18 L140 22 C146 24 148 30 146 36 L4 36 C0 34 2 28 8 26Z" fill="#0bb5a8" stroke="#fffdf8" stroke-width="2.5"/>
+          <path d="M46 6 L66 4 C76 4 86 10 92 18 L44 18Z" fill="#7fe3ef" stroke="#fffdf8" stroke-width="2"/>
+          <circle cx="32" cy="38" r="10" fill="#14101c" stroke="#fffdf8" stroke-width="2.5"/><circle cx="118" cy="38" r="10" fill="#14101c" stroke="#fffdf8" stroke-width="2.5"/>
+        </g>
+      </svg>
+    </div>
+    <span class="tag">المهمة ٣ من ٤</span>
+    <h2>أي وقت؟</h2>
+    <p class="hint">الصبح ولا نطولها لآخر الليل؟</p>
+    <div class="chips" id="g-times"></div>
+  </section>
+
+  <section class="card mission">
+    <div class="shot" aria-hidden="true">
+      <svg viewBox="0 0 500 200" preserveAspectRatio="xMidYMid slice">
+        <rect width="500" height="200" fill="#14101c"/>
+        <g fill="#ffd400"><circle cx="40" cy="30" r="2"/><circle cx="120" cy="60" r="1.5"/><circle cx="460" cy="40" r="2"/><circle cx="380" cy="20" r="1.5"/><circle cx="300" cy="170" r="1.5"/></g>
+        <path d="M250 0 V26" stroke="#fffdf8" stroke-width="3"/>
+        <circle cx="250" cy="66" r="40" fill="#7a3cff" stroke="#fffdf8" stroke-width="3"/>
+        <g stroke="#fffdf8" stroke-width="2" fill="none" opacity=".6"><ellipse cx="250" cy="66" rx="40" ry="13"/><ellipse cx="250" cy="66" rx="40" ry="28"/><ellipse cx="250" cy="66" rx="13" ry="40"/><ellipse cx="250" cy="66" rx="28" ry="40"/></g>
+        <g stroke-width="5" stroke-linecap="round"><path d="M220 120 L150 200" stroke="#ff3d8b"/><path d="M250 124 V200" stroke="#ffd400"/><path d="M280 120 L350 200" stroke="#0bb5a8"/></g>
+        <g transform="translate(46 70)"><rect width="110" height="60" rx="6" fill="none" stroke="#ff3d8b" stroke-width="4"/><text x="55" y="42" text-anchor="middle" font-family="Cairo, sans-serif" font-size="30" fill="#ff3d8b">سهرة</text></g>
+        <g transform="translate(372 82)" stroke="#0bb5a8" stroke-width="4" fill="none" stroke-linecap="round"><rect x="20" y="0" width="28" height="42" rx="14"/><path d="M10 28c0 24 48 24 48 0"/><path d="M34 52v24M18 78h32"/></g>
+      </svg>
+    </div>
+    <span class="tag">المهمة ٤ من ٤</span>
+    <h2>شو نسوّي؟</h2>
+    <p class="hint">اختار كل الأشياء اللي تبيها</p>
+    <div class="chips" id="g-acts"></div>
+    <div class="add-row">
+      <input type="text" id="add-act" maxlength="40" placeholder="عندك فكرة ثانية؟" aria-label="اقترح فكرة ثانية">
+      <button type="button" class="btn" id="add-act-btn">زيد</button>
+    </div>
+  </section>
+
+  <section class="card">
+    <label class="field" for="note">ملاحظة للشلة</label>
+    <textarea id="note" maxlength="300" placeholder="أكل ما تاكله، واحد بيجي معاك، أو شي ما تبيه"></textarea>
+    <button type="button" class="btn go" id="submit">سلّم المهمة</button>
+    <p class="status" id="status" role="status"></p>
+    <div id="fb" class="nudge" style="display:flex;flex-direction:column;gap:12px;border:2.5px solid var(--ink);border-radius:4px;padding:16px" hidden>
+      <h2 style="font-size:1.5rem">أرسل أجوبتك في القروب</h2>
+      <p class="hint" style="margin:0">ما قدرنا نحفظ أجوبتك. انسخها والصقها في قروب الشلة، وصاحب الطلعة بيضيفها للصفحة.</p>
+      <textarea id="fb-text" readonly style="min-height:130px"></textarea>
+      <button type="button" class="btn big" id="fb-copy">انسخ أجوبتي</button>
+      <p class="status" id="fb-status" role="status"></p>
+    </div>
+  </section>
+
+  <section class="card nudge" id="nudge" hidden>
+    <span class="tag">مهمة إضافية</span>
+    <h2>نكّز الشلة</h2>
+    <p class="hint" id="nudge-hint">انسخ الرسالة والصقها في قروب الشلة عشان الباقين يجاوبون.</p>
+    <label class="field" for="nudge-text" style="font-size:1.1rem">الرسالة</label>
+    <textarea id="nudge-text"></textarea>
+    <div class="row2">
+      <button type="button" class="btn big" id="nudge-copy">انسخ النكزة</button>
+      <button type="button" class="btn" id="nudge-shuffle">رسالة ثانية</button>
+    </div>
+    <p class="status" id="nudge-status" role="status"></p>
+  </section>
+
+  <section class="card">
+    <h2>لوحة الأصوات</h2>
+    <div id="results"></div>
+  </section>
+
+  <section class="card">
+    <div class="head-row"><h2>الطاقم</h2><p class="hint" id="people-count" style="margin:0"></p></div>
+    <p class="badge-key"><span><b>أول واحد جاوب</b></span><span><b>آخر واحد بس وصل</b></span><span><b>صاحب الاقتراح الفايز</b>: اقترح خيار جديد وفاز</span><span><b>قلب الشلة</b>: اختار المتصدّر في الأربع</span><span><b>مرن على الآخر</b>: أكثر واحد خيارات</span></p>
+    <div class="crew" id="people"></div>
+  </section>
+
+  <p class="foot">تقدر ترجع وتغيّر أجوبتك أي وقت من نفس الجهاز. المهمة النهائية تتحدّث مع كل صوت.</p>
+  <footer class="site-foot"><a class="brand" href="./"><svg class="mark" viewBox="0 0 64 64" aria-hidden="true"><rect width="64" height="64" rx="14" fill="#ff3d8b" stroke="#14101c" stroke-width="3"/><circle cx="32" cy="38" r="16" fill="#ffd400" stroke="#14101c" stroke-width="4"/><path d="M8 46h48" stroke="#14101c" stroke-width="4"/><path d="M14 54h36" stroke="#0bb5a8" stroke-width="4"/></svg><span>طلعة الشلة</span></a><span>موقع خاص بالشلة. أي أحد عنده الرابط يقدر يشوف ويجاوب.</span></footer>
+</div>
+
+<script>
+(function(){
+  try{ document.documentElement.setAttribute("lang","ar"); document.documentElement.setAttribute("dir","rtl"); }catch(e){}
+
+  var PRESETS = {
+    places: ["يوم بحر","البر وقت الغروب","عشا على السطح","كافيهات","مول","السركال أفينيو"],
+    dates: [["2026-11-27","الجمعة ٢٧ نوفمبر"],["2026-11-28","السبت ٢٨ نوفمبر"],["2026-12-02","الأربعاء ٢ ديسمبر","اليوم الوطني"],["2026-12-03","الخميس ٣ ديسمبر","عطلة"],["2026-12-04","الجمعة ٤ ديسمبر"],["2026-12-05","السبت ٥ ديسمبر"]],
+    times: ["الصبح","الظهر","العصر","وقت الغروب","الليل","آخر الليل"],
+    acts: ["فطور","كاريوكي","ألعاب طاولة","ليلة أفلام","بولينج","بادل","كارتينج"]
+  };
+  var CATS = ["places","dates","times","acts"];
+  var TITLES = {places:"وين", dates:"اليوم", times:"الوقت", acts:"النشاط"};
+  var COLORS = ["var(--pink)","var(--orange)","var(--teal)","var(--violet)","var(--yellow)"];
+  var DATE_LABEL = {}; PRESETS.dates.forEach(function(d){ DATE_LABEL[d[0]] = d[1]; });
+
+  var sel = {places:new Map(), dates:new Map(), times:new Map(), acts:new Map()};
+  var responses = [];
+  var myId = null, hydrated = false, dbRef = null, gotSnapshot = false, saving = false;
+  var lock = null, isOwner = false, lockBusy = false, lockSel = {};
+
+  function $(id){ return document.getElementById(id); }
+  function keyOf(s){ return String(s).trim().toLowerCase(); }
+  function el(tag, cls, text){ var e = document.createElement(tag); if(cls) e.className = cls; if(text != null) e.textContent = text; return e; }
+  function labelOf(cat, v){ return cat === "dates" ? (DATE_LABEL[v] || v) : v; }
+  function arr(v){ return Array.isArray(v) ? v.filter(function(x){ return typeof x === "string"; }).slice(0,30) : []; }
+  function countWord(n, one, many){ return n === 1 ? one : n + " " + many; }
+
+  function tick(){
+    try{
+      var d = new Date(), h = String(d.getHours()).padStart(2,"0"), m = String(d.getMinutes()).padStart(2,"0");
+      $("clock").textContent = h + ":" + m;
+    }catch(e){}
+  }
+  tick(); setInterval(tick, 30000);
+
+  function tallies(){
+    var t = {}; CATS.forEach(function(c){ t[c] = new Map(); });
+    responses.forEach(function(r){
+      CATS.forEach(function(c){
+        arr(r.data[c]).forEach(function(v){
+          var k = keyOf(v); if(!k) return;
+          var e = t[c].get(k); if(!e){ e = {label:v, count:0}; t[c].set(k,e); }
+          e.count++;
+        });
+      });
+    });
+    return t;
+  }
+
+  function optionList(cat, t){
+    var out = [], seen = new Set();
+    function push(value, label, tag){ var k = keyOf(value); if(seen.has(k)) return; seen.add(k); out.push({value:value, label:label, tag:tag}); }
+    if(cat === "dates"){ PRESETS.dates.forEach(function(d){ push(d[0], d[1], d[2]); }); }
+    else { PRESETS[cat].forEach(function(p){ push(p,p); }); }
+    if(cat === "places" || cat === "acts" || cat === "dates"){
+      t[cat].forEach(function(e){ push(e.label, e.label); });
+      sel[cat].forEach(function(label){ push(label, label); });
+    }
+    return out;
+  }
+
+  function renderChips(){
+    var t = tallies();
+    CATS.forEach(function(cat){
+      var box = $("g-" + cat); box.textContent = "";
+      optionList(cat, t).forEach(function(o){
+        var k = keyOf(o.value), on = sel[cat].has(k), e = t[cat].get(k);
+        var b = el("button","chip"); b.type = "button"; b.setAttribute("aria-pressed", on ? "true" : "false");
+        b.appendChild(el("span","", o.label));
+        if(o.tag) b.appendChild(el("span","lbl2", o.tag));
+        if(e && e.count) b.appendChild(el("span","n", String(e.count)));
+        b.addEventListener("click", function(){
+          if(sel[cat].has(k)) sel[cat].delete(k); else sel[cat].set(k, o.value);
+          renderChips();
+        });
+        box.appendChild(b);
+      });
+    });
+  }
+
+  function topOf(map){
+    var best = 0, names = [];
+    map.forEach(function(e){ if(e.count > best){ best = e.count; names = [e.label]; } else if(e.count === best && best > 0){ names.push(e.label); } });
+    return {count:best, names:names};
+  }
+
+  function renderPlan(t){
+    var body = $("plan-body"); body.textContent = "";
+    $("plan-count").textContent = responses.length ? countWord(responses.length, "جواب واحد", "أجوبة") : "";
+    var card = body.closest(".final");
+    if(lock){
+      card.classList.add("locked");
+      $("final-title").textContent = "المهمة انحسمت";
+      body.appendChild(el("p","stamp","الخطة مقفولة"));
+      var lg = el("div","final-grid");
+      [["places","وين"],["dates","متى"],["times","الوقت"],["acts","شو نسوّي"]].forEach(function(p){
+        var v = typeof lock[p[0]] === "string" && lock[p[0]] ? labelOf(p[0], lock[p[0]].slice(0,60)) : "بنقرره بعدين";
+        var cell = el("div"); cell.appendChild(el("p","k",p[1])); cell.appendChild(el("p","v",v)); lg.appendChild(cell);
+      });
+      body.appendChild(lg);
+      body.appendChild(el("p","see","خلاص، انحسمت. شوفكم هناك!"));
+      return;
+    }
+    card.classList.remove("locked");
+    $("final-title").textContent = "المهمة النهائية";
+    if(!responses.length){ body.appendChild(el("p","big","المهمة ما انحسمت للحين. كون أول واحد يجاوب!")); return; }
+    var grid = el("div","final-grid");
+    [["places","وين"],["dates","متى"],["times","الوقت"],["acts","شو نسوّي"]].forEach(function(p){
+      var cat = p[0], top = topOf(t[cat]);
+      var cell = el("div"); cell.appendChild(el("p","k",p[1]));
+      var txt;
+      if(!top.count) txt = "للحين مفتوح";
+      else {
+        var names = top.names.slice(0,2).map(function(n){ return labelOf(cat, n); });
+        txt = names.join(" أو ") + (top.names.length > 2 ? " +" + (top.names.length - 2) : "");
+      }
+      cell.appendChild(el("p","v",txt));
+      grid.appendChild(cell);
+    });
+    body.appendChild(grid);
+  }
+
+  function renderResults(t){
+    var box = $("results"); box.textContent = "";
+    if(!responses.length){ box.appendChild(el("p","empty","الأصوات بتطلع هني أول ما أحد يسلّم مهمته.")); return; }
+    var wrap = el("div","board");
+    CATS.forEach(function(cat){
+      var rows = Array.from(t[cat].values()).sort(function(a,b){ return b.count - a.count || a.label.localeCompare(b.label); }).slice(0,8);
+      var blk = el("div","blk"); blk.appendChild(el("h3","",TITLES[cat]));
+      if(!rows.length) blk.appendChild(el("p","empty","ما في اختيارات للحين."));
+      var max = rows.length ? rows[0].count : 1;
+      rows.forEach(function(r,i){
+        var row = el("div","row");
+        row.appendChild(el("span","lbl",labelOf(cat, r.label)));
+        var tr = el("div","track"), f = el("div","fill");
+        f.style.setProperty("--c", COLORS[i % COLORS.length]);
+        f.style.width = Math.max(6, Math.round(r.count / max * 100)) + "%";
+        tr.appendChild(f); row.appendChild(tr); row.appendChild(el("span","cnt",String(r.count)));
+        blk.appendChild(row);
+      });
+      wrap.appendChild(blk);
+    });
+    box.appendChild(wrap);
+  }
+
+  function renderPeople(){
+    var box = $("people"); box.textContent = "";
+    var badges = badgesFor();
+    $("people-count").textContent = responses.length ? countWord(responses.length, "واحد", "أشخاص") : "";
+    if(!responses.length){ box.appendChild(el("p","empty","الطاقم فاضي. كون أول واحد ينضم.")); return; }
+    responses.slice().sort(function(a,b){ return (b.data.updatedAt||0) - (a.data.updatedAt||0); }).forEach(function(r){
+      var p = el("div","member");
+      var head = el("div"); head.appendChild(el("b","", String(r.data.name || "واحد من الشلة").slice(0,40)));
+      if(r.id === myId) head.appendChild(el("span","you","إنت"));
+      p.appendChild(head);
+      var mine = badges[r.id];
+      if(mine && mine.length){
+        var bw = el("div","badges");
+        mine.forEach(function(txt){ bw.appendChild(el("span","badge",txt)); });
+        p.appendChild(bw);
+      }
+      [["places","وين"],["dates","الأيام"],["times","الوقت"],["acts","النشاط"]].forEach(function(c){
+        var vals = arr(r.data[c[0]]).map(function(v){ return labelOf(c[0], v); });
+        if(!vals.length) return;
+        var line = el("p"); line.appendChild(el("span","",c[1] + ": ")); line.appendChild(document.createTextNode(vals.join("، ")));
+        p.appendChild(line);
+      });
+      if(r.data.note) p.appendChild(el("p","note", String(r.data.note).slice(0,300)));
+      box.appendChild(p);
+    });
+  }
+
+  function renderLockPanel(t){
+    var panel = $("lock-panel");
+    if(!isOwner){ panel.hidden = true; return; }
+    panel.hidden = false;
+    CATS.forEach(function(cat){
+      var s = $("lk-" + cat), keep = lockSel[cat];
+      if(keep == null && lock && typeof lock[cat] === "string") keep = lock[cat];
+      var opts = optionList(cat, t).map(function(o){ var e = t[cat].get(keyOf(o.value)); return {value:o.value, label:o.label, count: e ? e.count : 0}; });
+      opts.sort(function(a,b){ return b.count - a.count; });
+      s.textContent = "";
+      var none = el("option","","بنقرره بعدين"); none.value = ""; s.appendChild(none);
+      opts.forEach(function(o){ var op = el("option","", o.label + (o.count ? " (" + o.count + ")" : "")); op.value = o.value; s.appendChild(op); });
+      if(keep != null && opts.some(function(o){ return o.value === keep; })) s.value = keep;
+      else if(keep === "") s.value = "";
+      else s.value = opts.length && opts[0].count ? opts[0].value : "";
+    });
+    $("lock-btn").textContent = lock ? "حدّث الخطة المقفولة" : "اقفل الخطة";
+    $("unlock-btn").hidden = !lock;
+  }
+  CATS.forEach(function(cat){ $("lk-" + cat).addEventListener("change", function(e){ lockSel[cat] = e.target.value; }); });
+
+  $("lock-btn").addEventListener("click", function(){
+    if(!dbRef || lockBusy) return;
+    lockBusy = true; $("lock-btn").disabled = true; $("lock-status").textContent = "لحظة، نقفل الخطة...";
+    primeAudio();
+    var data = {lockedAt: Date.now()};
+    CATS.forEach(function(c){ data[c] = String($("lk-" + c).value || "").slice(0,60); });
+    dbRef.setPlan(data).then(function(){
+      lockSel = {}; $("lock-status").textContent = "تقفلت الخطة. الشلة كلها تشوفها الحين.";
+    }).catch(function(){ $("lock-status").textContent = "ما انقفلت. جرّب مرة ثانية."; })
+      .then(function(){ lockBusy = false; $("lock-btn").disabled = false; });
+  });
+  $("unlock-btn").addEventListener("click", function(){
+    if(!dbRef || lockBusy) return;
+    lockBusy = true; $("unlock-btn").disabled = true;
+    dbRef.setPlan(null).then(function(){
+      lockSel = {}; $("lock-status").textContent = "انفتحت الخطة. التصويت شغال مرة ثانية.";
+    }).catch(function(){ $("lock-status").textContent = "ما انفتحت. جرّب مرة ثانية."; })
+      .then(function(){ lockBusy = false; $("unlock-btn").disabled = false; });
+  });
+
+  function onLock(data){
+    var prev = lock;
+    lock = data;
+    if(lock && lock.lockedAt && (!prev || prev.lockedAt !== lock.lockedAt)){
+      var key = "seen-lock-" + lock.lockedAt, seen = false;
+      try{ seen = localStorage.getItem(key) === "1"; }catch(e){}
+      if(!seen){
+        try{ localStorage.setItem(key, "1"); }catch(e){}
+        setTimeout(function(){ celebrateLock(); }, 300);
+      }
+    }
+    renderAll();
+  }
+  function celebrateLock(){
+    var a = $("ach");
+    $("ach-k").textContent = "إنجاز بلاتيني للشلة";
+    $("ach-t").textContent = "المهمة انحسمت";
+    var bits = [];
+    if(lock.places) bits.push(labelOf("places", lock.places));
+    if(lock.dates) bits.push(labelOf("dates", lock.dates));
+    $("ach-d").textContent = bits.length ? bits.join("، ") : "الخطة تقفلت";
+    a.hidden = false; a.classList.remove("show"); void a.offsetWidth; a.classList.add("show");
+    chime(); confetti();
+    clearTimeout(achTimer);
+    achTimer = setTimeout(function(){ a.classList.remove("show"); setTimeout(function(){ a.hidden = true; }, 600); }, 6000);
+  }
+
+  // ---- Nudge the crew ----
+  var nudgeIdx = 0, nudgeEdited = false;
+  var NUDGES = [
+    function(me, n, names){ return "أنا سلّمت مهمتي في طلعة الشلة! " + (n > 1 ? "جاوب " + n + " لين الحين (" + names + "). " : "") + "وينكم؟ افتحوا الرابط وجاوبوا قبل لا نقفل الخطة"; },
+    function(me, n, names){ return "يا شباب " + me + " سلّم وأخذ إنجازه البلاتيني. اللي ما جاوب لين الحين بيفوته القرار. الرابط فوق في القروب"; },
+    function(me, n, names){ return "تنبيه من المهمة: " + n + " جاوبوا والباقين نايمين. دقيقة وحدة بس، اختاروا وين ومتى وشو نسوّي"; }
+  ];
+  function nudgeText(){
+    var mine = responses.filter(function(r){ return r.id === myId; })[0];
+    var me = mine ? String(mine.data.name || "").slice(0,40) : ($("name").value.trim().slice(0,40) || "واحد من الشلة");
+    var n = Math.max(responses.length, 1);
+    var names = responses.map(function(r){ return String(r.data.name || "").slice(0,40); }).filter(Boolean).slice(0,8).join("، ");
+    return NUDGES[nudgeIdx % NUDGES.length](me, n, names);
+  }
+  function showNudge(scroll){
+    var c = $("nudge");
+    if(!myId || !responses.some(function(r){ return r.id === myId; })){ if(!scroll){ c.hidden = true; return; } }
+    c.hidden = false;
+    if(!nudgeEdited) $("nudge-text").value = nudgeText();
+    if(scroll){ setTimeout(function(){ try{ c.scrollIntoView({behavior:"smooth", block:"center"}); }catch(e){} }, 1200); }
+  }
+  $("nudge-text").addEventListener("input", function(){ nudgeEdited = true; });
+  $("nudge-shuffle").addEventListener("click", function(){ nudgeIdx++; nudgeEdited = false; $("nudge-text").value = nudgeText(); $("nudge-status").textContent = ""; });
+  function selectNudge(){
+    var t = $("nudge-text"); t.focus(); t.select();
+    $("nudge-status").textContent = "النسخ ما اشتغل هني. حدّدت لك الرسالة، انسخها من القائمة.";
+  }
+  $("nudge-copy").addEventListener("click", function(){
+    var text = $("nudge-text").value;
+    try{
+      if(navigator.clipboard && navigator.clipboard.writeText){
+        navigator.clipboard.writeText(text).then(function(){
+          $("nudge-status").textContent = "اننسخت! الحين الصقها في قروب الشلة.";
+        }).catch(selectNudge);
+      } else { selectNudge(); }
+    }catch(e){ selectNudge(); }
+  });
+
+  var PRESET_KEYS = {};
+  CATS.forEach(function(cat){
+    PRESET_KEYS[cat] = new Set(cat === "dates" ? PRESETS.dates.map(function(d){ return keyOf(d[0]); }) : PRESETS[cat].map(keyOf));
+  });
+  function badgesFor(){
+    var out = {};
+    function add(id, txt){ var l = out[id] = out[id] || []; if(l.indexOf(txt) < 0) l.push(txt); }
+    if(!responses.length) return out;
+    function ct(r){ return Number(r.data.createdAt || r.data.updatedAt || 0); }
+    var sorted = responses.slice().sort(function(a,b){ return ct(a) - ct(b); });
+    add(sorted[0].id, "أول واحد جاوب");
+    if(sorted.length >= 3) add(sorted[sorted.length - 1].id, "آخر واحد بس وصل");
+    var t = tallies(), tops = {};
+    CATS.forEach(function(cat){
+      var tp = topOf(t[cat]);
+      tops[cat] = tp.count ? tp.names.map(keyOf) : [];
+      var winners = lock && typeof lock[cat] === "string" && lock[cat] ? [keyOf(lock[cat])] : tops[cat];
+      winners.forEach(function(w){
+        if(PRESET_KEYS[cat].has(w)) return;
+        var who = sorted.filter(function(r){ return arr(r.data[cat]).some(function(v){ return keyOf(v) === w; }); })[0];
+        if(who) add(who.id, "صاحب الاقتراح الفايز");
+      });
+    });
+    if(responses.length >= 2){
+      responses.forEach(function(r){
+        var ok = CATS.every(function(cat){ return tops[cat].length && arr(r.data[cat]).some(function(v){ return tops[cat].indexOf(keyOf(v)) >= 0; }); });
+        if(ok) add(r.id, "قلب الشلة");
+      });
+      var best = 0, bestId = null, tie = false;
+      responses.forEach(function(r){
+        var n = 0; CATS.forEach(function(c){ n += arr(r.data[c]).length; });
+        if(n > best){ best = n; bestId = r.id; tie = false; } else if(n === best){ tie = true; }
+      });
+      if(bestId && !tie && best >= 6) add(bestId, "مرن على الآخر");
+    }
+    return out;
+  }
+
+  function renderAll(){ var t = tallies(); renderPlan(t); renderResults(t); renderPeople(); renderChips(); renderLockPanel(t); showNudge(false); }
+
+  function hydrate(){
+    if(hydrated || !myId) return;
+    var mine = responses.filter(function(r){ return r.id === myId; })[0];
+    if(!mine) return;
+    hydrated = true;
+    $("name").value = String(mine.data.name || "");
+    $("note").value = String(mine.data.note || "");
+    CATS.forEach(function(c){ sel[c] = new Map(); arr(mine.data[c]).forEach(function(v){ sel[c].set(keyOf(v), v); }); });
+    $("status").textContent = "جبنا لك أجوبتك. غيّر اللي تبي وسلّمها مرة ثانية.";
+  }
+
+  function addCustom(cat, inputId){
+    var inp = $(inputId), v = inp.value.trim().slice(0,40);
+    if(!v) return;
+    var k = keyOf(v), existing = null;
+    optionList(cat, tallies()).forEach(function(o){ if(keyOf(o.value) === k) existing = o.value; });
+    sel[cat].set(k, existing || v);
+    inp.value = ""; renderChips();
+  }
+  $("add-place-btn").addEventListener("click", function(){ addCustom("places","add-place"); });
+  $("add-act-btn").addEventListener("click", function(){ addCustom("acts","add-act"); });
+  $("add-date-btn").addEventListener("click", function(){ addCustom("dates","add-date"); });
+  $("add-date").addEventListener("keydown", function(e){ if(e.key === "Enter"){ e.preventDefault(); addCustom("dates","add-date"); } });
+  $("add-place").addEventListener("keydown", function(e){ if(e.key === "Enter"){ e.preventDefault(); addCustom("places","add-place"); } });
+  $("add-act").addEventListener("keydown", function(e){ if(e.key === "Enter"){ e.preventDefault(); addCustom("acts","add-act"); } });
+
+  $("submit").addEventListener("click", function(){
+    var st = $("status"), name = $("name").value.trim();
+    if(!name){ st.textContent = "اكتب اسمك أول."; $("name").focus(); return; }
+    var total = 0; CATS.forEach(function(c){ total += sel[c].size; });
+    if(!total){ st.textContent = "اختار خيار واحد على الأقل."; return; }
+    if(!dbRef || !myId){ st.textContent = ""; showFallback(name); return; }
+    if(saving) return;
+    saving = true; $("submit").disabled = true; st.textContent = "لحظة، نسلّم المهمة...";
+    var wasNew = !responses.some(function(r){ return r.id === myId; });
+    primeAudio();
+    var mineNow = responses.filter(function(r){ return r.id === myId; })[0];
+    var created = mineNow && Number(mineNow.data.createdAt) ? Number(mineNow.data.createdAt) : (mineNow && Number(mineNow.data.updatedAt) ? Number(mineNow.data.updatedAt) : Date.now());
+    var data = {name:name.slice(0,40), note:$("note").value.trim().slice(0,300), updatedAt:Date.now(), createdAt:created};
+    CATS.forEach(function(c){ data[c] = Array.from(sel[c].values()).slice(0,30); });
+    dbRef.saveMine(data).then(function(){
+      hydrated = true; st.textContent = "تمّت المهمة! تقدر تعدّل أي وقت.";
+      celebrate(wasNew, data.name);
+      nudgeEdited = false; showNudge(true);
+    }).catch(function(e){
+      st.textContent = "ما قدرنا نحفظ أجوبتك الحين. انسخها وأرسلها في القروب، أو جرّب بعد شوي.";
+      showFallback(name);
+    }).then(function(){ saving = false; $("submit").disabled = false; });
+  });
+
+  // ---- Fallback when this viewer cannot save ----
+  function answersText(name){
+    var lines = ["أجوبتي لمهمة الطلعة", "الاسم: " + name.slice(0,40)];
+    [["places","وين"],["dates","الأيام"],["times","الوقت"],["acts","النشاط"]].forEach(function(c){
+      var v = Array.from(sel[c[0]].values()).map(function(x){ return labelOf(c[0], x); });
+      if(v.length) lines.push(c[1] + ": " + v.join("، "));
+    });
+    var n = $("note").value.trim().slice(0,300);
+    if(n) lines.push("ملاحظة: " + n);
+    return lines.join("\n");
+  }
+  function showFallback(name){
+    $("fb-text").value = answersText(name);
+    $("fb").hidden = false; $("fb-status").textContent = "";
+    setTimeout(function(){ try{ $("fb").scrollIntoView({behavior:"smooth", block:"center"}); }catch(e){} }, 100);
+  }
+  function selectFb(){
+    var t = $("fb-text"); t.focus(); t.select();
+    $("fb-status").textContent = "النسخ ما اشتغل هني. حدّدت لك النص، انسخه من القائمة.";
+  }
+  $("fb-copy").addEventListener("click", function(){
+    var text = $("fb-text").value;
+    try{
+      if(navigator.clipboard && navigator.clipboard.writeText){
+        navigator.clipboard.writeText(text).then(function(){ $("fb-status").textContent = "اننسخت! الصقها في قروب الشلة."; }).catch(selectFb);
+      } else { selectFb(); }
+    }catch(e){ selectFb(); }
+  });
+
+  // ---- Achievement celebration ----
+  var actx = null, achTimer = null;
+  function primeAudio(){
+    try{ var C = window.AudioContext || window.webkitAudioContext; if(C && !actx) actx = new C(); if(actx && actx.state === "suspended") actx.resume(); }catch(e){ actx = null; }
+  }
+  function chime(){
+    if(!actx) return;
+    try{
+      var now = actx.currentTime + 0.05;
+      [[659.25,0],[880,0.12],[1318.5,0.24]].forEach(function(n){
+        var o = actx.createOscillator(), g = actx.createGain();
+        o.type = "triangle"; o.frequency.value = n[0];
+        g.gain.setValueAtTime(0.0001, now + n[1]);
+        g.gain.exponentialRampToValueAtTime(0.22, now + n[1] + 0.02);
+        g.gain.exponentialRampToValueAtTime(0.0001, now + n[1] + 0.9);
+        o.connect(g); g.connect(actx.destination); o.start(now + n[1]); o.stop(now + n[1] + 1);
+      });
+    }catch(e){}
+  }
+  function confetti(){
+    var reduce = false; try{ reduce = window.matchMedia("(prefers-reduced-motion: reduce)").matches; }catch(e){}
+    if(reduce) return;
+    var cv = $("confetti"), ctx = cv.getContext && cv.getContext("2d"); if(!ctx) return;
+    var dpr = Math.min(window.devicePixelRatio || 1, 2), W = cv.clientWidth, H = cv.clientHeight;
+    cv.width = W * dpr; cv.height = H * dpr; ctx.setTransform(dpr,0,0,dpr,0,0);
+    var cols = ["#ff3d8b","#ff8f1f","#ffd400","#0bb5a8","#7a3cff","#d8e2ff"], ps = [];
+    for(var i=0;i<160;i++){
+      var side = i % 2 ? 1 : -1;
+      ps.push({x: side > 0 ? W*0.1 : W*0.9, y: H*0.35, vx: side*(3+Math.random()*7), vy: -6-Math.random()*9,
+        w: 6+Math.random()*6, h: 4+Math.random()*8, r: Math.random()*6, vr: (Math.random()-.5)*.4, c: cols[i % cols.length]});
+    }
+    var t0 = performance.now();
+    (function frame(t){
+      ctx.clearRect(0,0,W,H);
+      var alive = false;
+      ps.forEach(function(p){
+        p.vy += 0.28; p.vx *= 0.99; p.x += p.vx; p.y += p.vy; p.r += p.vr;
+        if(p.y < H + 20) alive = true;
+        ctx.save(); ctx.translate(p.x,p.y); ctx.rotate(p.r); ctx.fillStyle = p.c; ctx.fillRect(-p.w/2,-p.h/2,p.w,p.h); ctx.restore();
+      });
+      if(alive && t - t0 < 4500) requestAnimationFrame(frame); else ctx.clearRect(0,0,W,H);
+    })(t0);
+  }
+  function celebrate(wasNew, name){
+    var a = $("ach");
+    $("ach-t").textContent = wasNew ? "مخطّط الطلعات" : "غيّرت رأيك";
+    $("ach-d").textContent = wasNew ? (String(name || "").slice(0,40) + "، سلّمت المهمات الأربع كلها") : "أجوبتك الجديدة انحفظت في الخطة";
+    $("ach-k").textContent = wasNew ? "إنجاز بلاتيني انفتح" : "إنجاز انفتح";
+    a.hidden = false; a.classList.remove("show");
+    void a.offsetWidth;
+    a.classList.add("show");
+    chime(); confetti();
+    clearTimeout(achTimer);
+    achTimer = setTimeout(function(){ a.classList.remove("show"); setTimeout(function(){ a.hidden = true; }, 600); }, 5000);
+  }
+
+  renderAll();
+
+  var loadTimer = setTimeout(function(){
+    if(!gotSnapshot) $("people").insertAdjacentElement("afterbegin", el("p","empty","ما قدرنا نوصل للأجوبة لايف للحين. يمكن اللي تشوفه مو محدّث."));
+  }, 10000);
+
+  // ---- Shared store on Firebase Realtime Database (REST, no SDK) ----
+  var FB = "";
+  function normFB(v){
+    v = String(v || "").trim(); if(!v) return "";
+    if(!/^https?:\/\//i.test(v)) v = "https://" + v;
+    try{ var u = new URL(v); if(u.protocol !== "https:") return ""; if(!/(\.firebasedatabase\.app|\.firebaseio\.com)$/i.test(u.hostname)) return ""; return "https://" + u.hostname; }catch(e){ return ""; }
+  }
+  var SEED = {"manual-ammoura": {"name": "عمورة", "places": ["البر وقت الغروب", "عشا على السطح", "كافيهات", "مول"], "dates": ["الأحد 29 نوفمبر"], "times": ["وقت الغروب", "الليل", "آخر الليل"], "acts": ["كاريوكي", "ألعاب طاولة", "ليلة أفلام", "نتمنيك"], "note": "خليفيا ✨✨✨ (يمكن مش اكيد)", "createdAt": 1795469640000, "updatedAt": 1795469640000}};
+  var params = new URLSearchParams(location.search);
+  var gid = params.get("g"), hostKey = params.get("host") || "";
+  FB = normFB(params.get("db"));
+  function lsGet(k){ try{ return localStorage.getItem(k); }catch(e){ return null; } }
+  function lsSet(k,v){ try{ localStorage.setItem(k,v); }catch(e){} }
+  function rid(){ var a = new Uint8Array(9); crypto.getRandomValues(a); return Array.from(a, function(b){ return b.toString(16).padStart(2,"0"); }).join(""); }
+  async function sha(str){
+    var b = await crypto.subtle.digest("SHA-256", new TextEncoder().encode(str));
+    return Array.from(new Uint8Array(b), function(x){ return x.toString(16).padStart(2,"0"); }).join("");
+  }
+  function url(path){ return FB.replace(/\/+$/,"") + "/hangouts/" + encodeURIComponent(gid) + (path ? "/" + path : "") + ".json"; }
+  async function fbGet(path){
+    var r = await fetch(url(path), {cache:"no-store"});
+    if(!r.ok) throw new Error("http " + r.status);
+    return await r.json();
+  }
+  async function fbPut(path, val){
+    var r = await fetch(url(path), {method:"PUT", headers:{"Content-Type":"application/json"}, body:JSON.stringify(val)});
+    if(!r.ok) throw new Error("http " + r.status);
+  }
+  async function fetchState(){ var j = await fbGet(""); return (j && typeof j === "object") ? j : {}; }
+  function applyState(st){
+    var rs = (st.responses && typeof st.responses === "object") ? st.responses : {};
+    responses = Object.keys(rs).map(function(id){ return {id:id, data:(rs[id] && typeof rs[id] === "object") ? rs[id] : {}}; });
+    gotSnapshot = true; clearTimeout(loadTimer);
+    hydrate();
+    onLock(st.plan && typeof st.plan === "object" ? st.plan : null);
+  }
+  var store = {
+    saveMine: async function(data){ await fbPut("responses/" + encodeURIComponent(myId), data); applyState(await fetchState()); },
+    setPlan: async function(p){ if(!isOwner) throw new Error("not host"); await fbPut("plan", p); applyState(await fetchState()); }
+  };
+  async function poll(){ try{ applyState(await fetchState()); }catch(e){} }
+
+  function copyFrom(inputId, statusEl){
+    var inp = $(inputId), text = inp.value;
+    function sel(){ inp.focus(); inp.select(); statusEl.textContent = "حدّدت لك الرابط، انسخه من القائمة."; }
+    try{
+      if(navigator.clipboard && navigator.clipboard.writeText){
+        navigator.clipboard.writeText(text).then(function(){ statusEl.textContent = "اننسخ!"; }).catch(sel);
+      } else sel();
+    }catch(e){ sel(); }
+  }
+  function showSetup(){
+    document.body.classList.add("setup-mode");
+    $("setup").hidden = false;
+    var savedFb = lsGet("hangout-fb"); if(savedFb) $("fb-url").value = savedFb;
+    var saved = lsGet("hangout-host-link");
+    if(saved){ $("setup-status").textContent = "سوّيت طلعة قبل من هالجهاز. تقدر تفتحها من رابطك، أو تسوّي طلعة جديدة."; showLinks(saved.split("&host=")[0], saved); }
+  }
+  function showLinks(friends, host){
+    $("friends-link").value = friends; $("host-link").value = host;
+    $("setup-links").hidden = false;
+  }
+  $("copy-friends").addEventListener("click", function(){ copyFrom("friends-link", $("setup-status")); });
+  $("copy-host").addEventListener("click", function(){ copyFrom("host-link", $("setup-status")); });
+  $("open-host").addEventListener("click", function(){ location.href = $("host-link").value; });
+  $("setup-btn").addEventListener("click", async function(){
+    var b = $("setup-btn"), stEl = $("setup-status");
+    var fbIn = normFB($("fb-url").value);
+    if(!fbIn){ stEl.textContent = "الصق رابط قاعدة البيانات أول. لازم ينتهي بـ firebasedatabase.app"; $("fb-url").focus(); return; }
+    FB = fbIn; lsSet("hangout-fb", FB);
+    b.disabled = true; stEl.textContent = "لحظة، نجهّز الطلعة...";
+    try{
+      var key = rid() + rid(), hash = await sha(key);
+      gid = rid();
+      await fbPut("", {responses:SEED, hostHash:hash, createdAt:Date.now()});
+      var base = location.origin + location.pathname;
+      var friends = base + "?db=" + encodeURIComponent(FB.replace("https://","")) + "&g=" + encodeURIComponent(gid), host = friends + "&host=" + key;
+      lsSet("hangout-host-link", host);
+      showLinks(friends, host);
+      stEl.textContent = "جاهزة! انسخ رابط الشلة وأرسله في القروب، واحتفظ برابطك.";
+    }catch(e){
+      gid = null;
+      var msg = String(e && e.message || e);
+      stEl.textContent = /401|403/.test(msg)
+        ? "قاعدة البيانات رفضت الكتابة. تأكد إنك اخترت Start in test mode."
+        : "ما قدرنا نوصل لقاعدة البيانات. تأكد من الرابط والإنترنت وجرّب مرة ثانية.";
+    }
+    b.disabled = false;
+  });
+
+  async function boot(){
+    if(!gid || !FB){ showSetup(); clearTimeout(loadTimer); return; }
+    myId = lsGet("hangout-me-" + gid);
+    if(!myId){ myId = rid(); lsSet("hangout-me-" + gid, myId); }
+    try{
+      var st = await fetchState();
+      if(hostKey && st.hostHash){ try{ isOwner = (await sha(hostKey)) === st.hostHash; }catch(e){ isOwner = false; } }
+      dbRef = store;
+      applyState(st);
+    }catch(e){
+      clearTimeout(loadTimer);
+      $("status").textContent = "ما قدرنا نوصل للأجوبة الحين. تقدر تختار أجوبتك وتنسخها للقروب.";
+    }
+    setInterval(function(){ if(!document.hidden && dbRef) poll(); }, 8000);
+    document.addEventListener("visibilitychange", function(){ if(!document.hidden && dbRef) poll(); });
+  }
+  boot();
+})();
+</script>
+</body></html>
