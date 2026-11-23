@@ -40,7 +40,11 @@ canvas{position:fixed; inset:0; width:100%; height:100%; display:block}
 #morning .caret{display:inline-block; width:.06em; height:.9em; background:currentColor; margin-inline-start:.08em; vertical-align:-.08em; animation:blink 1s steps(1) infinite}
 @keyframes blink{50%{opacity:0}}
 #forever{font-size:clamp(3.4rem, 18vw, 7.6rem); color:var(--white); opacity:0; transform:scale(.6); text-shadow:0 0 22px rgba(255,61,119,.85), 0 0 60px rgba(255,61,119,.55)}
-body.love #forever{animation:pop 1.4s cubic-bezier(.2,1.5,.35,1) .2s forwards, beat 1.6s ease-in-out 1.8s infinite}
+body.love #forever{animation:pop 1.4s cubic-bezier(.2,1.5,.35,1) .2s forwards}
+#lv{display:inline-block; min-height:1.4em; transition:opacity .7s ease, transform .7s ease, filter .7s ease}
+#lv.out{opacity:0; transform:scale(1.25); filter:blur(8px)}
+#lv.beat{animation:beat 1.2s ease-in-out infinite}
+.count{display:block; font-family:var(--font-ui); font-weight:700; font-size:.16em; color:var(--blush); opacity:.8; margin-top:.4em; text-shadow:none; font-variant-numeric:tabular-nums}
 @keyframes pop{0%{opacity:0; transform:scale(.6)} 100%{opacity:1; transform:scale(1)}}
 @keyframes beat{0%,100%{transform:scale(1)} 15%{transform:scale(1.07)} 30%{transform:scale(1)} 45%{transform:scale(1.05)}}
 .name{display:block; font-size:.42em; color:var(--blush); margin-top:.2em; opacity:0; transition:opacity 1.2s ease 1.4s; text-shadow:none}
@@ -73,9 +77,9 @@ body.love .again{opacity:1; transition-delay:3.6s}
 <svg class="big-heart" viewBox="0 0 120 110" aria-hidden="true"><path d="M60 100 C22 74 6 54 6 33 C6 17 18 6 33 6 C45 6 55 13 60 24 C65 13 75 6 87 6 C102 6 114 17 114 33 C114 54 98 74 60 100 Z"/></svg>
 
 <main class="stage">
-  <h1 class="sr">صباح الخير حبيبي، أحبك للأبد</h1>
+  <h1 class="sr">صباح الخير حبيبي، أحبك، أحبك، أحبك للأبد</h1>
   <p class="line" id="morning" aria-hidden="true"></p>
-  <p class="line" id="forever" aria-hidden="true">أحبك للأبد<span class="name">يا حمود</span></p>
+  <p class="line" id="forever" aria-hidden="true"><span id="lv"></span><span class="name">يا حمود</span><span class="count" id="count"></span></p>
 </main>
 <p class="hint" aria-hidden="true">المس الشاشة</p>
 <button type="button" class="again" id="again">مرة ثانية</button>
@@ -102,6 +106,10 @@ body.love .again{opacity:1; transition-delay:3.6s}
   }
   function spawnFloat(){
     var cols = mode === "love" ? NIGHT : DAWN;
+    if(mode === "love" && Math.random() < 0.16){
+      hearts.push({x:40 + Math.random()*(W-80), y:H + 30, vx:0, vy:-(0.5 + Math.random()*0.7), s:16 + Math.random()*18, a:0, life:1, wob:Math.random()*6, c:cols[Math.floor(Math.random()*cols.length)], burst:false, word:true});
+      return;
+    }
     hearts.push({x:Math.random()*W, y:H + 30, vx:(Math.random()-.5)*.3, vy:-(0.4 + Math.random()*0.9), s:8 + Math.random()*(mode === "love" ? 22 : 12), a:0, life:1, wob:Math.random()*6, c:cols[Math.floor(Math.random()*cols.length)], burst:false});
   }
   function burst(x, y, n){
@@ -113,18 +121,21 @@ body.love .again{opacity:1; transition-delay:3.6s}
   var acc = 0, last = performance.now();
   function frame(t){
     var dt = Math.min(50, t - last); last = t;
-    acc += dt * (mode === "love" ? 0.012 : 0.005);
+    acc += dt * (mode === "love" ? 0.009 : 0.005);
     while(acc > 1){ spawnFloat(); acc -= 1; }
     ctx.clearRect(0,0,W,H);
     for(var i = hearts.length - 1; i >= 0; i--){
       var h = hearts[i];
       if(h.burst){ h.vy += 0.12; h.vx *= 0.985; h.life -= 0.011; h.a = Math.max(0, h.life); }
-      else { h.wob += 0.03; h.x += h.vx + Math.sin(h.wob)*0.4; h.a = Math.min(0.9, h.a + 0.02); if(h.y < H*0.25) h.a *= 0.985; }
+      else { h.wob += 0.03; h.x += h.vx + Math.sin(h.wob)*0.4; h.a = Math.min(h.word ? 0.5 : 0.85, h.a + 0.02); if(h.y < H*0.25) h.a *= 0.985; }
       h.x += h.burst ? h.vx : 0; h.y += h.vy;
       if(h.y < -40 || h.life <= 0 || h.a < 0.02 && h.y < H*0.3){ hearts.splice(i,1); continue; }
       ctx.save(); ctx.translate(h.x, h.y); ctx.rotate(Math.sin(h.wob)*0.25); ctx.globalAlpha = h.a;
       if(mode === "love"){ ctx.shadowColor = h.c; ctx.shadowBlur = 10; }
-      ctx.fillStyle = h.c; heartPath(h.s); ctx.fill(); ctx.restore();
+      ctx.fillStyle = h.c;
+      if(h.word){ ctx.font = "700 " + Math.round(h.s) + "px 'Aref Ruqaa', 'Amiri', serif"; ctx.textAlign = "center"; ctx.direction = "rtl"; ctx.fillText("أحبك", 0, 0); }
+      else { heartPath(h.s); ctx.fill(); }
+      ctx.restore();
     }
     if(hearts.length > 400) hearts.splice(0, hearts.length - 400);
     requestAnimationFrame(frame);
@@ -146,8 +157,22 @@ body.love .again{opacity:1; transition-delay:3.6s}
       else later(function(){ caret.remove(); done(); }, 1400);
     })();
   }
+  var lv = document.getElementById("lv"), countEl = document.getElementById("count"), loops = 0;
+  function loveLoop(){
+    var word = Array.from("أحبك"), i = 0;
+    lv.classList.remove("out", "beat"); lv.textContent = "";
+    if(reduce){ lv.textContent = "أحبك"; loops++; countEl.textContent = loops > 1 ? "× " + loops : ""; later(loveLoop, 2600); return; }
+    (function step(){
+      i++; lv.textContent = word.slice(0, i).join("");
+      if(i < word.length){ later(step, 170); return; }
+      loops++; countEl.textContent = loops > 1 ? "× " + loops : "";
+      lv.classList.add("beat");
+      burst(W/2, H/2, 22);
+      later(function(){ lv.classList.remove("beat"); lv.classList.add("out"); later(loveLoop, 750); }, 2400);
+    })();
+  }
   function play(){
-    timers.forEach(clearTimeout); timers = [];
+    timers.forEach(clearTimeout); timers = []; loops = 0; countEl.textContent = ""; lv.textContent = "";
     hearts = []; mode = "dawn";
     body.className = "";
     morning.classList.remove("gone");
@@ -158,6 +183,7 @@ body.love .again{opacity:1; transition-delay:3.6s}
         morning.classList.add("gone");
         later(function(){
           mode = "love"; body.classList.remove("morning"); body.classList.add("love");
+          later(loveLoop, 300);
           if(!reduce){ burst(W/2, H/2, 70); later(function(){ burst(W*0.25, H*0.35, 30); burst(W*0.75, H*0.4, 30); }, 700); }
         }, 1100);
       });
