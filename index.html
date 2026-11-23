@@ -915,7 +915,7 @@ body.setup-mode .wrap > section:not(#setup), body.setup-mode .wrap > .foot, body
     if(!/^https?:\/\//i.test(v)) v = "https://" + v;
     try{ var u = new URL(v); if(u.protocol !== "https:") return ""; if(!/(\.firebasedatabase\.app|\.firebaseio\.com)$/i.test(u.hostname)) return ""; return "https://" + u.hostname; }catch(e){ return ""; }
   }
-  var SEED = {"manual-ammoura": {"name": "عمورة", "places": ["البر وقت الغروب", "عشا على السطح", "كافيهات", "مول"], "dates": ["الأحد 29 نوفمبر"], "times": ["وقت الغروب", "الليل", "آخر الليل"], "acts": ["كاريوكي", "ألعاب طاولة", "ليلة أفلام", "نتمنيك"], "note": "خليفيا ✨✨✨ (يمكن مش اكيد)", "createdAt": 1795469640000, "updatedAt": 1795469640000}};
+  var SEED = {};
   var params = new URLSearchParams(location.search);
   var gid = params.get("g"), hostKey = params.get("host") || "";
   FB = normFB(params.get("db"));
