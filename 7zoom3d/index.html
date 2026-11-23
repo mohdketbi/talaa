@@ -1,0 +1,879 @@
+<!doctype html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>7zoom3D</title>
+<meta name="description" content="طباعة ثلاثية الأبعاد في الإمارات. اختار المجسّم واللون والمقاس، واطلب بخطوة وحدة.">
+<meta property="og:title" content="7zoom3D: نطبع لك أفكارك">
+<meta property="og:description" content="اختار المجسّم واللون والمقاس، واطلب بخطوة وحدة.">
+<meta property="og:type" content="website">
+<meta property="og:image" content="https://mohdketbi.github.io/talaa/7zoom3d/preview.png">
+<meta property="og:url" content="https://mohdketbi.github.io/talaa/7zoom3d/">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="theme-color" content="#f4f5f8">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='16' fill='%2315151c'/%3E%3Cpath d='M16 44h32M18 38h28M20 32h24M22 26h20' stroke='%23ff6a1a' stroke-width='4' stroke-linecap='round'/%3E%3Cpath d='M32 10v8' stroke='%23fff' stroke-width='4' stroke-linecap='round'/%3E%3C/svg%3E">
+<link rel="apple-touch-icon" href="icon.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Readex+Pro:wght@400;500;600;700&family=IBM+Plex+Sans+Arabic:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+/* Layout: RTL single column, max 1080px. Sticky header with wordmark, hero with an SVG part being printed layer by layer, three-step strip, product grid, bottom-sheet order form, tracking card, footer. Admin view swaps the shop for orders/products panels. Motif: print layer lines. */
+:root{
+  --bg:#f4f5f8; --surface:#ffffff; --ink:#15151c; --muted:#5b5e6d; --line:#dfe2ea; --soft:#eceef3;
+  --accent:#ff6a1a; --accent-ink:#ffffff; --accent-soft:#ffe6d8; --teal:#0f9d94; --violet:#6c4cf5; --danger:#c4123f;
+  --shadow:0 1px 2px rgba(21,21,28,.06), 0 8px 24px rgba(21,21,28,.06);
+  --font-display:"Readex Pro","IBM Plex Sans Arabic","Segoe UI",Tahoma,system-ui,sans-serif;
+  --font-body:"IBM Plex Sans Arabic","Readex Pro","Segoe UI",Tahoma,system-ui,sans-serif;
+  color-scheme:light;
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    --bg:#111217; --surface:#1a1c23; --ink:#f2f3f7; --muted:#a3a7b7; --line:#2c2f3a; --soft:#22252e;
+    --accent:#ff7a33; --accent-ink:#1a0d05; --accent-soft:#3a2216; --teal:#2cc4b9; --violet:#9b85ff; --danger:#ff5c7f;
+    --shadow:0 1px 2px rgba(0,0,0,.3), 0 8px 24px rgba(0,0,0,.25); color-scheme:dark;
+  }
+}
+:root[data-theme="dark"]{
+  --bg:#111217; --surface:#1a1c23; --ink:#f2f3f7; --muted:#a3a7b7; --line:#2c2f3a; --soft:#22252e;
+  --accent:#ff7a33; --accent-ink:#1a0d05; --accent-soft:#3a2216; --teal:#2cc4b9; --violet:#9b85ff; --danger:#ff5c7f;
+  --shadow:0 1px 2px rgba(0,0,0,.3), 0 8px 24px rgba(0,0,0,.25); color-scheme:dark;
+}
+*{box-sizing:border-box}
+[hidden]{display:none!important}
+html{scroll-behavior:smooth}
+body{
+  margin:0; direction:rtl; background:var(--bg); color:var(--ink); font-family:var(--font-body); font-size:17px; line-height:1.65;
+  padding-bottom:env(safe-area-inset-bottom,0px);
+}
+.gut{padding-left:max(16px, env(safe-area-inset-left,0px)); padding-right:max(16px, env(safe-area-inset-right,0px))}
+.wrap{max-width:1080px; margin:0 auto}
+h1,h2,h3{font-family:var(--font-display); line-height:1.25; margin:0; text-wrap:balance}
+p{margin:0}
+a{color:inherit}
+button{font:inherit}
+:focus-visible{outline:3px solid var(--violet); outline-offset:3px}
+
+/* header */
+.top{position:sticky; top:0; z-index:20; background:color-mix(in srgb, var(--bg) 88%, transparent); backdrop-filter:blur(10px); -webkit-backdrop-filter:blur(10px); border-bottom:1px solid var(--line); padding-top:env(safe-area-inset-top,0px)}
+.top .wrap{display:flex; align-items:center; justify-content:space-between; gap:12px; height:62px}
+.logo{display:flex; align-items:center; gap:10px; text-decoration:none; direction:ltr}
+.logo svg{width:34px; height:34px; flex:none}
+.logo b{font-family:var(--font-display); font-weight:700; font-size:1.3rem; letter-spacing:-.01em}
+.logo b span{color:var(--accent)}
+.nav{display:flex; gap:6px}
+.nav a{font-weight:600; font-size:.95rem; text-decoration:none; padding:7px 12px; border-radius:999px; color:var(--muted)}
+.nav a:hover{background:var(--soft); color:var(--ink)}
+.nav a.cta{background:var(--ink); color:var(--bg)}
+
+/* hero */
+.hero{padding-block:44px 28px}
+.hero .wrap{display:grid; grid-template-columns:1.1fr .9fr; gap:28px; align-items:center}
+.eyebrow{display:inline-flex; align-items:center; gap:8px; font-weight:600; font-size:.9rem; color:var(--teal); background:color-mix(in srgb, var(--teal) 12%, transparent); padding:4px 12px; border-radius:999px}
+.eyebrow i{width:8px; height:8px; border-radius:50%; background:var(--teal); display:inline-block}
+.hero h1{font-size:clamp(2.3rem, 7vw, 3.7rem); font-weight:700; margin-top:14px; letter-spacing:-.01em}
+.hero h1 em{font-style:normal; color:var(--accent)}
+.hero .lede{margin-top:14px; font-size:1.12rem; color:var(--muted); max-width:42ch}
+.hero .acts{display:flex; gap:10px; flex-wrap:wrap; margin-top:22px}
+.btn{display:inline-flex; align-items:center; justify-content:center; gap:8px; border:0; border-radius:14px; padding:12px 20px; font-weight:700; cursor:pointer; text-decoration:none; transition:transform .12s ease, background .12s ease}
+.btn:active{transform:scale(.98)}
+.btn.primary{background:var(--accent); color:var(--accent-ink)}
+.btn.dark{background:var(--ink); color:var(--bg)}
+.btn.ghost{background:var(--surface); color:var(--ink); border:1px solid var(--line)}
+.btn.small{padding:7px 14px; border-radius:10px; font-size:.92rem}
+.btn:disabled{opacity:.5; cursor:not-allowed}
+.printer{position:relative; aspect-ratio:1/1; max-width:420px; width:100%; justify-self:center; background:var(--surface); border:1px solid var(--line); border-radius:28px; box-shadow:var(--shadow); overflow:hidden}
+.printer svg{display:block; width:100%; height:100%}
+.printer .bed{fill:var(--soft)}
+.printer .frame{stroke:var(--ink)}
+.printer .layers rect{fill:var(--accent)}
+.printer .layers rect:nth-child(odd){fill:color-mix(in srgb, var(--accent) 82%, var(--ink))}
+@keyframes grow{from{transform:scaleY(0)} to{transform:scaleY(1)}}
+.printer .layers{transform-origin:50% 100%; transform-box:fill-box; animation:grow 2.6s steps(12,end) .3s both}
+@keyframes nozzle{0%{transform:translate(0,0)} 50%{transform:translate(-44px,-4px)} 100%{transform:translate(0,0)}}
+.printer .head{animation:nozzle 1.3s ease-in-out infinite}
+
+.steps{padding-block:8px 30px}
+.steps ol{list-style:none; margin:0; padding:0; display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); gap:14px}
+.steps li{background:var(--surface); border:1px solid var(--line); border-radius:18px; padding:16px; display:flex; gap:12px; align-items:flex-start}
+.steps .n{flex:none; width:34px; height:34px; border-radius:10px; display:grid; place-items:center; font-family:var(--font-display); font-weight:700; background:var(--accent-soft); color:var(--accent)}
+.steps b{display:block; font-family:var(--font-display); font-size:1.05rem}
+.steps span{color:var(--muted); font-size:.95rem}
+
+/* catalog */
+section.block{padding-block:20px 34px}
+.head-row{display:flex; justify-content:space-between; align-items:end; gap:12px; flex-wrap:wrap; margin-bottom:16px}
+.head-row h2{font-size:clamp(1.6rem,5vw,2.1rem)}
+.head-row p{color:var(--muted)}
+.grid{display:grid; grid-template-columns:repeat(auto-fill,minmax(230px,1fr)); gap:16px}
+.card{background:var(--surface); border:1px solid var(--line); border-radius:20px; overflow:hidden; display:flex; flex-direction:column; min-width:0}
+.card .ph{aspect-ratio:4/3; background:var(--soft); display:grid; place-items:center; position:relative; overflow:hidden}
+.card .ph::after{content:""; position:absolute; inset:0; background:repeating-linear-gradient(0deg, transparent 0 7px, color-mix(in srgb, var(--ink) 4%, transparent) 7px 8px); pointer-events:none}
+.card .ph img{width:100%; height:100%; object-fit:cover}
+.card .ph svg{width:62%; height:auto}
+.card .body{padding:14px 16px 16px; display:flex; flex-direction:column; gap:8px; flex:1}
+.card h3{font-size:1.12rem}
+.card p{color:var(--muted); font-size:.95rem}
+.dots{display:flex; gap:5px; flex-wrap:wrap; margin-top:auto; padding-top:6px}
+.dots i{width:14px; height:14px; border-radius:50%; border:1px solid color-mix(in srgb, var(--ink) 18%, transparent); display:inline-block}
+.card .btn{margin-top:8px}
+.tag{display:inline-block; align-self:flex-start; font-size:.78rem; font-weight:700; color:var(--violet); background:color-mix(in srgb, var(--violet) 12%, transparent); border-radius:999px; padding:1px 10px}
+
+/* track */
+.track{background:var(--surface); border:1px solid var(--line); border-radius:22px; padding:20px; display:flex; flex-direction:column; gap:14px}
+.row{display:flex; gap:10px; flex-wrap:wrap}
+input,select,textarea{font:inherit; color:var(--ink); background:var(--bg); border:1px solid var(--line); border-radius:12px; padding:11px 14px; width:100%; min-width:0}
+textarea{resize:vertical; min-height:84px}
+.row input{flex:1 1 200px; width:auto}
+.ltr{direction:ltr; text-align:left}
+.timeline{list-style:none; margin:0; padding:0; display:flex; flex-direction:column; gap:0}
+.timeline li{display:flex; gap:12px; align-items:flex-start; position:relative; padding-bottom:16px}
+.timeline li::before{content:""; position:absolute; right:11px; top:24px; bottom:0; width:2px; background:var(--line)}
+.timeline li:last-child::before{display:none}
+.timeline .dot{flex:none; width:24px; height:24px; border-radius:50%; border:2px solid var(--line); background:var(--surface); position:relative; z-index:1}
+.timeline li.done .dot{background:var(--teal); border-color:var(--teal)}
+.timeline li.now .dot{background:var(--accent); border-color:var(--accent); box-shadow:0 0 0 5px var(--accent-soft)}
+.timeline li.done::before{background:var(--teal)}
+.timeline b{font-family:var(--font-display)}
+.timeline span{display:block; color:var(--muted); font-size:.9rem}
+.summary{background:var(--soft); border-radius:14px; padding:12px 14px; display:grid; grid-template-columns:auto 1fr; gap:4px 14px; font-size:.95rem}
+.summary dt{color:var(--muted)}
+.summary dd{margin:0; font-weight:600; overflow-wrap:anywhere}
+.msg{color:var(--muted); font-weight:600; min-height:1.4em}
+.msg.err{color:var(--danger)}
+
+/* sheet */
+.scrim{position:fixed; inset:0; background:rgba(10,10,16,.45); z-index:40}
+.sheet{position:fixed; z-index:41; left:0; right:0; bottom:0; max-height:92vh; overflow:auto; background:var(--surface); border-radius:24px 24px 0 0; box-shadow:0 -10px 40px rgba(0,0,0,.2); padding:0}
+@media (min-width:760px){ .sheet{left:50%; right:auto; bottom:auto; top:50%; transform:translate(-50%,-50%); width:min(620px, calc(100% - 32px)); border-radius:24px; max-height:88vh} }
+.sheet .grab{width:44px; height:5px; border-radius:3px; background:var(--line); margin:10px auto 0}
+.sheet .sh-head{position:sticky; top:0; background:var(--surface); z-index:2; display:flex; align-items:center; gap:12px; padding:12px max(18px, env(safe-area-inset-right,0px)) 12px max(18px, env(safe-area-inset-left,0px)); border-bottom:1px solid var(--line)}
+.sheet .sh-head .thumb{width:52px; height:52px; border-radius:12px; background:var(--soft); overflow:hidden; flex:none; display:grid; place-items:center}
+.sheet .sh-head .thumb img{width:100%; height:100%; object-fit:cover}
+.sheet .sh-head .thumb svg{width:70%}
+.sheet .sh-head h3{font-size:1.15rem; flex:1; min-width:0}
+.x{flex:none; width:38px; height:38px; border-radius:50%; border:0; background:var(--soft); color:var(--ink); font-size:1.3rem; cursor:pointer; line-height:1}
+.form{display:flex; flex-direction:column; gap:18px; padding:16px max(18px, env(safe-area-inset-right,0px)) 0 max(18px, env(safe-area-inset-left,0px))}
+.field{display:flex; flex-direction:column; gap:8px}
+.field > label, .field > .lbl{font-weight:700; font-size:.98rem}
+.field small{color:var(--muted); font-weight:500}
+.swatches{display:flex; flex-wrap:wrap; gap:10px}
+.sw{display:flex; flex-direction:column; align-items:center; gap:4px; cursor:pointer; border:0; background:none; padding:0; color:var(--ink); font-size:.78rem; font-weight:600; width:58px}
+.sw i{width:40px; height:40px; border-radius:50%; border:2px solid var(--line); display:block; box-shadow:inset 0 -6px 0 rgba(0,0,0,.08)}
+.sw[aria-pressed="true"] i{border-color:var(--ink); box-shadow:0 0 0 3px var(--surface), 0 0 0 5px var(--accent)}
+.pills{display:flex; flex-wrap:wrap; gap:8px}
+.pill{border:1px solid var(--line); background:var(--bg); color:var(--ink); border-radius:999px; padding:7px 16px; font-weight:600; cursor:pointer}
+.pill[aria-pressed="true"]{background:var(--ink); color:var(--bg); border-color:var(--ink)}
+.qty{display:inline-flex; align-items:center; gap:0; border:1px solid var(--line); border-radius:12px; overflow:hidden; align-self:flex-start}
+.qty button{width:44px; height:44px; border:0; background:var(--soft); color:var(--ink); font-size:1.3rem; cursor:pointer}
+.qty output{min-width:48px; text-align:center; font-weight:700; font-variant-numeric:tabular-nums}
+.two{display:grid; grid-template-columns:1fr 1fr; gap:12px}
+.sheet .foot{position:sticky; bottom:0; background:var(--surface); padding:14px max(18px, env(safe-area-inset-right,0px)) 0 max(18px, env(safe-area-inset-left,0px)); border-top:1px solid var(--line); margin-top:18px; display:flex; flex-direction:column; gap:8px; padding-bottom:calc(14px + env(safe-area-inset-bottom,0px)); z-index:2}
+.sheet .foot .btn{width:100%; padding:14px; font-size:1.05rem}
+.done-box{display:flex; flex-direction:column; align-items:center; text-align:center; gap:12px; padding:26px max(18px, env(safe-area-inset-right,0px)) calc(26px + env(safe-area-inset-bottom,0px)) max(18px, env(safe-area-inset-left,0px))}
+.done-box .ok{width:72px; height:72px; border-radius:50%; background:color-mix(in srgb, var(--teal) 16%, transparent); display:grid; place-items:center}
+.done-box .code{font-family:var(--font-display); font-weight:700; font-size:2rem; letter-spacing:.06em; direction:ltr; background:var(--soft); border-radius:14px; padding:6px 18px}
+
+/* admin */
+.admin-bar{background:var(--ink); color:var(--bg)}
+.admin-bar .wrap{display:flex; align-items:center; justify-content:space-between; gap:10px; padding-block:8px; font-weight:700; font-size:.92rem; flex-wrap:wrap}
+.tabs{display:flex; gap:6px; background:var(--soft); padding:5px; border-radius:14px; align-self:flex-start}
+.tabs button{border:0; background:none; color:var(--muted); font-weight:700; padding:8px 16px; border-radius:10px; cursor:pointer}
+.tabs button[aria-selected="true"]{background:var(--surface); color:var(--ink); box-shadow:var(--shadow)}
+.filters{display:flex; gap:8px; flex-wrap:wrap; margin:14px 0}
+.orders{display:grid; grid-template-columns:repeat(auto-fill,minmax(300px,1fr)); gap:14px}
+.order{background:var(--surface); border:1px solid var(--line); border-radius:18px; padding:14px 16px; display:flex; flex-direction:column; gap:10px; min-width:0; border-top:4px solid var(--st, var(--line))}
+.order .o-top{display:flex; justify-content:space-between; align-items:center; gap:8px}
+.order .o-code{font-family:var(--font-display); font-weight:700; direction:ltr}
+.order .o-time{color:var(--muted); font-size:.85rem}
+.order dl{margin:0; display:grid; grid-template-columns:auto 1fr; gap:3px 12px; font-size:.95rem}
+.order dt{color:var(--muted)}
+.order dd{margin:0; font-weight:600; overflow-wrap:anywhere}
+.order .o-acts{display:flex; gap:8px; flex-wrap:wrap; align-items:center}
+.order select{width:auto; flex:1 1 150px; padding:8px 10px}
+.st{display:inline-block; font-size:.8rem; font-weight:700; padding:2px 10px; border-radius:999px; background:color-mix(in srgb, var(--st) 16%, transparent); color:var(--st)}
+.del{border:1px solid var(--danger); color:var(--danger); background:transparent; border-radius:10px; padding:7px 12px; font-weight:700; cursor:pointer}
+.del.armed{background:var(--danger); color:#fff}
+.plist{display:flex; flex-direction:column; gap:10px}
+.pitem{display:flex; align-items:center; gap:12px; background:var(--surface); border:1px solid var(--line); border-radius:16px; padding:10px 12px}
+.pitem .thumb{width:56px; height:56px; border-radius:12px; background:var(--soft); overflow:hidden; flex:none; display:grid; place-items:center}
+.pitem .thumb img{width:100%; height:100%; object-fit:cover}
+.pitem .thumb svg{width:70%}
+.pitem .info{flex:1; min-width:0}
+.pitem .info b{display:block; font-family:var(--font-display)}
+.pitem .info span{color:var(--muted); font-size:.88rem}
+.checks{display:flex; flex-wrap:wrap; gap:8px}
+.checks label{display:inline-flex; align-items:center; gap:6px; border:1px solid var(--line); border-radius:999px; padding:5px 12px 5px 10px; font-weight:600; font-size:.92rem; cursor:pointer; background:var(--bg)}
+.checks input{width:auto; accent-color:var(--accent)}
+.checks i{width:14px; height:14px; border-radius:50%; display:inline-block; border:1px solid color-mix(in srgb, var(--ink) 20%, transparent)}
+.switch{display:flex; align-items:center; gap:10px; font-weight:700}
+.switch input{width:22px; height:22px; accent-color:var(--accent)}
+.photo-box{display:flex; gap:12px; align-items:center}
+.photo-box .thumb{width:84px; height:84px; border-radius:14px; background:var(--soft); overflow:hidden; display:grid; place-items:center; flex:none}
+.photo-box .thumb img{width:100%; height:100%; object-fit:cover}
+.empty{color:var(--muted); background:var(--surface); border:1px dashed var(--line); border-radius:18px; padding:24px; text-align:center}
+
+footer{border-top:1px solid var(--line); margin-top:20px; padding-block:26px 34px; color:var(--muted); font-size:.92rem}
+footer .wrap{display:flex; justify-content:space-between; gap:12px; flex-wrap:wrap; align-items:center}
+
+#confetti{position:fixed; inset:0; width:100%; height:100%; pointer-events:none; z-index:60}
+.toast{position:fixed; z-index:61; left:50%; bottom:calc(20px + env(safe-area-inset-bottom,0px)); transform:translateX(-50%); background:var(--ink); color:var(--bg); padding:10px 18px; border-radius:12px; font-weight:700; box-shadow:var(--shadow); max-width:calc(100% - 32px)}
+
+@media (max-width:760px){
+  .hero{padding-block:26px 18px}
+  .hero .wrap{grid-template-columns:1fr}
+  .printer{max-width:300px; order:-1}
+  .steps ol{grid-template-columns:1fr}
+  .nav a:not(.cta){display:none}
+  .two{grid-template-columns:1fr}
+}
+@media (prefers-reduced-motion: reduce){
+  html{scroll-behavior:auto}
+  .printer .layers,.printer .head{animation:none}
+  .btn{transition:none}
+}
+</style>
+</head>
+<body>
+<canvas id="confetti" aria-hidden="true"></canvas>
+
+<div class="admin-bar gut" id="admin-bar" hidden>
+  <div class="wrap"><span>وضع صاحب المتجر</span><a href="./" style="color:inherit">شوف المتجر مثل الزبون</a></div>
+</div>
+
+<header class="top gut">
+  <div class="wrap">
+    <a class="logo" href="./" aria-label="7zoom3D">
+      <svg viewBox="0 0 64 64" aria-hidden="true"><rect width="64" height="64" rx="16" fill="#15151c"/><path d="M16 44h32M18 38h28M20 32h24M22 26h20" stroke="#ff6a1a" stroke-width="4" stroke-linecap="round"/><path d="M32 10v8" stroke="#fff" stroke-width="4" stroke-linecap="round"/></svg>
+      <b>7zoom<span>3D</span></b>
+    </a>
+    <nav class="nav" id="shop-nav">
+      <a href="#catalog">المنتجات</a>
+      <a href="#track">تتبّع طلبك</a>
+      <a class="cta" href="#catalog">اطلب الحين</a>
+    </nav>
+  </div>
+</header>
+
+<main id="shop">
+  <section class="hero gut">
+    <div class="wrap">
+      <div>
+        <span class="eyebrow"><i></i> طباعة ثلاثية الأبعاد في الإمارات</span>
+        <h1>نطبع لك أفكارك <em>طبقة طبقة</em></h1>
+        <p class="lede">اختار المجسّم، وحدد اللون والمقاس، وأرسل طلبك. نتواصل معاك بالسعر على الواتساب قبل ما نبدأ الطباعة.</p>
+        <div class="acts">
+          <a class="btn primary" href="#catalog">تصفّح المنتجات</a>
+          <a class="btn ghost" href="#track">عندي طلب، أبي أتتبّعه</a>
+        </div>
+      </div>
+      <div class="printer" aria-hidden="true">
+        <svg viewBox="0 0 400 400">
+          <rect class="bed" x="70" y="318" width="260" height="18" rx="4"/>
+          <g class="frame" fill="none" stroke-width="6" stroke-linecap="round"><path d="M60 350V60h280v290"/><path d="M60 86h280"/></g>
+          <g class="layers">
+            <rect x="140" y="300" width="120" height="18" rx="3"/>
+            <rect x="146" y="282" width="108" height="18" rx="3"/>
+            <rect x="150" y="264" width="100" height="18" rx="3"/>
+            <rect x="152" y="246" width="96" height="18" rx="3"/>
+            <rect x="150" y="228" width="100" height="18" rx="3"/>
+            <rect x="146" y="210" width="108" height="18" rx="3"/>
+            <rect x="142" y="192" width="116" height="18" rx="3"/>
+            <rect x="146" y="174" width="108" height="18" rx="3"/>
+            <rect x="156" y="156" width="88" height="18" rx="3"/>
+            <rect x="168" y="138" width="64" height="18" rx="3"/>
+          </g>
+          <g class="head">
+            <rect x="222" y="74" width="16" height="24" rx="3" fill="#6c4cf5"/>
+            <rect x="200" y="98" width="60" height="30" rx="8" fill="#15151c"/>
+            <path d="M222 128h16l-8 10z" fill="#15151c"/>
+          </g>
+        </svg>
+      </div>
+    </div>
+  </section>
+
+  <section class="steps gut" aria-label="كيف تطلب">
+    <div class="wrap">
+      <ol>
+        <li><span class="n">١</span><div><b>اختار المجسّم</b><span>من المنتجات اللي تحت</span></div></li>
+        <li><span class="n">٢</span><div><b>خصّصه</b><span>اللون، المقاس، والاسم إذا تبي</span></div></li>
+        <li><span class="n">٣</span><div><b>استلمه</b><span>نرسل لك السعر على الواتساب، وتتبّع طلبك من هني</span></div></li>
+      </ol>
+    </div>
+  </section>
+
+  <section class="block gut" id="catalog">
+    <div class="wrap">
+      <div class="head-row"><h2>المنتجات</h2><p>كل شي ينطبع عندنا بالطلب</p></div>
+      <div class="grid" id="grid"></div>
+    </div>
+  </section>
+
+  <section class="block gut" id="track">
+    <div class="wrap">
+      <div class="track">
+        <div class="head-row" style="margin:0"><h2>تتبّع طلبك</h2><p>اكتب رقم الطلب اللي وصلك</p></div>
+        <div class="row">
+          <input type="text" id="track-code" class="ltr" placeholder="7Z-1234" autocomplete="off" aria-label="رقم الطلب">
+          <button type="button" class="btn dark" id="track-btn">تتبّع</button>
+        </div>
+        <p class="msg" id="track-msg" role="status"></p>
+        <div id="track-out"></div>
+      </div>
+    </div>
+  </section>
+</main>
+
+<main id="admin" class="gut" hidden>
+  <div class="wrap" style="padding-block:24px 10px; display:flex; flex-direction:column; gap:16px">
+    <div class="tabs" role="tablist">
+      <button type="button" role="tab" id="tab-orders" aria-selected="true">الطلبات <span id="new-count"></span></button>
+      <button type="button" role="tab" id="tab-products" aria-selected="false">المنتجات</button>
+    </div>
+
+    <section id="panel-orders">
+      <div class="head-row"><h2>الطلبات</h2><p id="orders-sum"></p></div>
+      <div class="filters" id="filters"></div>
+      <div class="orders" id="orders"></div>
+    </section>
+
+    <section id="panel-products" hidden>
+      <div class="head-row"><h2>المنتجات</h2><button type="button" class="btn primary small" id="add-product">+ منتج جديد</button></div>
+      <p class="msg" id="prod-note"></p>
+      <div class="plist" id="plist"></div>
+    </section>
+  </div>
+</main>
+
+<footer class="gut">
+  <div class="wrap">
+    <span><b style="color:var(--ink)">7zoom3D</b> · طباعة ثلاثية الأبعاد بالطلب</span>
+    <span>الأسعار تختلف حسب الحجم والخامة، ونرسلها لك قبل ما نبدأ.</span>
+  </div>
+</footer>
+
+<!-- order sheet -->
+<div class="scrim" id="scrim" hidden></div>
+<div class="sheet" id="sheet" role="dialog" aria-modal="true" aria-labelledby="sh-title" hidden>
+  <div class="grab" aria-hidden="true"></div>
+  <div class="sh-head"><div class="thumb" id="sh-thumb"></div><h3 id="sh-title"></h3><button type="button" class="x" id="sh-close" aria-label="سكّر">×</button></div>
+  <div id="sh-form">
+    <div class="form">
+      <div class="field" id="f-color"><span class="lbl">اللون</span><div class="swatches" id="sw"></div></div>
+      <div class="field" id="f-size"><span class="lbl">المقاس</span><div class="pills" id="sizes"></div></div>
+      <div class="field" id="f-text"><label for="o-text" id="o-text-lbl">النص اللي ينطبع</label><input type="text" id="o-text" maxlength="40"></div>
+      <div class="field" id="f-link" hidden><label for="o-link">رابط المجسّم <small>(اختياري: Printables أو Thingiverse أو صورة)</small></label><input type="url" id="o-link" class="ltr" maxlength="300" placeholder="https://"></div>
+      <div class="field"><span class="lbl">الكمية</span><div class="qty"><button type="button" id="q-minus" aria-label="أقل">−</button><output id="q-val">1</output><button type="button" id="q-plus" aria-label="أكثر">+</button></div></div>
+      <div class="two">
+        <div class="field"><label for="o-name">اسمك</label><input type="text" id="o-name" maxlength="40" autocomplete="name"></div>
+        <div class="field"><label for="o-phone">رقم الواتساب</label><input type="tel" id="o-phone" class="ltr" maxlength="20" autocomplete="tel" placeholder="05X XXX XXXX"></div>
+      </div>
+      <div class="field"><label for="o-city">الإمارة</label>
+        <select id="o-city"><option value="">اختار</option><option>أبوظبي</option><option>دبي</option><option>الشارقة</option><option>عجمان</option><option>أم القيوين</option><option>رأس الخيمة</option><option>الفجيرة</option><option>العين</option></select>
+      </div>
+      <div class="field"><label for="o-notes">ملاحظات <small>(اختياري)</small></label><textarea id="o-notes" maxlength="400" placeholder="مثلاً: أبيه قبل الخميس، أو فكرة إضافية"></textarea></div>
+    </div>
+    <div class="foot">
+      <button type="button" class="btn primary" id="o-send">أرسل الطلب</button>
+      <p class="msg" id="o-msg" role="status" style="text-align:center"></p>
+    </div>
+  </div>
+  <div id="sh-done" hidden>
+    <div class="done-box">
+      <div class="ok"><svg width="38" height="38" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round" style="color:var(--teal)"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg></div>
+      <h3 style="font-size:1.5rem">وصلنا طلبك!</h3>
+      <p style="color:var(--muted)">بنتواصل معاك على الواتساب بالسعر قريب. احفظ رقم طلبك عشان تتبّعه:</p>
+      <div class="code" id="done-code"></div>
+      <div class="row" style="justify-content:center">
+        <button type="button" class="btn ghost small" id="copy-code">انسخ الرقم</button>
+        <button type="button" class="btn dark small" id="go-track">تتبّع الطلب</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- product editor sheet -->
+<div class="sheet" id="psheet" role="dialog" aria-modal="true" aria-labelledby="ps-title" hidden>
+  <div class="grab" aria-hidden="true"></div>
+  <div class="sh-head"><h3 id="ps-title">منتج</h3><button type="button" class="x" id="ps-close" aria-label="سكّر">×</button></div>
+  <div class="form">
+    <div class="field"><label for="p-name">اسم المنتج</label><input type="text" id="p-name" maxlength="60"></div>
+    <div class="field"><label for="p-desc">وصف قصير</label><textarea id="p-desc" maxlength="220"></textarea></div>
+    <div class="field"><span class="lbl">الصورة</span>
+      <div class="photo-box"><div class="thumb" id="p-thumb"></div>
+        <div class="row" style="flex:1"><label class="btn ghost small" for="p-photo" style="cursor:pointer">اختار صورة</label><input type="file" id="p-photo" accept="image/*" hidden><button type="button" class="btn ghost small" id="p-photo-clear">شيل الصورة</button></div>
+      </div>
+    </div>
+    <div class="field"><span class="lbl">الألوان المتوفرة</span><div class="checks" id="p-colors"></div></div>
+    <div class="field"><label for="p-sizes">المقاسات <small>(افصل بينها بفاصلة، أو خلها فاضية)</small></label><input type="text" id="p-sizes" maxlength="120" placeholder="صغير، وسط، كبير"></div>
+    <label class="switch"><input type="checkbox" id="p-personal"> فيه نص ينطبع (اسم أو كلمة)</label>
+    <div class="field" id="p-personal-lbl-f"><label for="p-personal-lbl">عنوان خانة النص</label><input type="text" id="p-personal-lbl" maxlength="40" placeholder="الاسم اللي ينطبع"></div>
+    <label class="switch"><input type="checkbox" id="p-custom"> الزبون يقدر يرسل رابط مجسّم</label>
+    <label class="switch"><input type="checkbox" id="p-visible" checked> يطلع في المتجر</label>
+  </div>
+  <div class="foot">
+    <button type="button" class="btn primary" id="p-save">احفظ المنتج</button>
+    <button type="button" class="del" id="p-del">احذف المنتج</button>
+    <p class="msg" id="p-msg" role="status" style="text-align:center"></p>
+  </div>
+</div>
+
+<div class="toast" id="toast" role="status" hidden></div>
+
+<script>
+(function(){
+  "use strict";
+  var FB = "https://hangout-3a844-default-rtdb.europe-west1.firebasedatabase.app";
+  var ROOT = "/shops/7zoom3d";
+  var ADMIN_HASH = "0d9e21be63c2683c983a924add5fbad326529866f91ec645c154e652d7bb0028";
+  var NTFY_TOPIC = "7zoom3d-a50efe476c46a2b1";
+
+  var COLORS = [
+    {id:"black", name:"أسود", hex:"#1b1b1f"}, {id:"white", name:"أبيض", hex:"#f7f7f5"}, {id:"grey", name:"رمادي", hex:"#9a9ca3"},
+    {id:"red", name:"أحمر", hex:"#d7263d"}, {id:"orange", name:"برتقالي", hex:"#ff6a1a"}, {id:"yellow", name:"أصفر", hex:"#ffd23f"},
+    {id:"green", name:"أخضر", hex:"#2bb673"}, {id:"blue", name:"أزرق", hex:"#2f6fdf"}, {id:"purple", name:"بنفسجي", hex:"#7b4fe0"},
+    {id:"pink", name:"وردي", hex:"#ff7eb6"}, {id:"gold", name:"ذهبي لامع", hex:"#d4a537"}, {id:"silver", name:"فضي لامع", hex:"#c9ccd3"}
+  ];
+  var COLOR = {}; COLORS.forEach(function(c){ COLOR[c.id] = c; });
+  var STATUSES = [
+    {id:"new", name:"جديد", hint:"وصلنا طلبك", color:"var(--violet)"},
+    {id:"confirmed", name:"تم التأكيد", hint:"اتفقنا على السعر", color:"#2f6fdf"},
+    {id:"printing", name:"قيد الطباعة", hint:"الطابعة شغالة عليه", color:"var(--accent)"},
+    {id:"ready", name:"جاهز", hint:"جاهز للاستلام أو التوصيل", color:"var(--teal)"},
+    {id:"delivered", name:"تم التسليم", hint:"وصلك، استانس فيه", color:"#2bb673"}
+  ];
+  var CANCELLED = {id:"cancelled", name:"ملغي", hint:"الطلب انلغى", color:"var(--danger)"};
+  var ST = {}; STATUSES.concat([CANCELLED]).forEach(function(s){ ST[s.id] = s; });
+
+  var ART = {
+    keychain:'<svg viewBox="0 0 120 90"><rect x="22" y="30" width="80" height="36" rx="12" fill="#ff6a1a" stroke="#15151c" stroke-width="3"/><circle cx="34" cy="48" r="5" fill="none" stroke="#15151c" stroke-width="3"/><path d="M34 43V22a10 10 0 0 1 10-10" fill="none" stroke="#9a9ca3" stroke-width="4" stroke-linecap="round"/><path d="M48 48h44" stroke="#fff" stroke-width="5" stroke-linecap="round"/></svg>',
+    stand:'<svg viewBox="0 0 120 90"><path d="M30 78h60l-8-10H38z" fill="#15151c"/><path d="M44 68L66 16" stroke="#2f6fdf" stroke-width="12" stroke-linecap="round"/><rect x="58" y="10" width="30" height="52" rx="6" transform="rotate(22 73 36)" fill="#f7f7f5" stroke="#15151c" stroke-width="3"/></svg>',
+    nameplate:'<svg viewBox="0 0 120 90"><path d="M18 70h84l-10-14H28z" fill="#15151c"/><rect x="24" y="24" width="72" height="34" rx="6" fill="#2bb673" stroke="#15151c" stroke-width="3"/><path d="M36 41h48" stroke="#fff" stroke-width="6" stroke-linecap="round"/></svg>',
+    vase:'<svg viewBox="0 0 120 90"><path d="M44 12h32c0 10-8 14-8 24 0 14 14 18 14 32 0 8-6 12-22 12s-22-4-22-12c0-14 14-18 14-32 0-10-8-14-8-24z" fill="#7b4fe0" stroke="#15151c" stroke-width="3"/><path d="M42 60h36M40 68h40M44 52h32" stroke="#fff" stroke-opacity=".5" stroke-width="2"/></svg>',
+    organizer:'<svg viewBox="0 0 120 90"><rect x="20" y="40" width="80" height="38" rx="6" fill="#ffd23f" stroke="#15151c" stroke-width="3"/><path d="M46 40v38M74 40v38" stroke="#15151c" stroke-width="3"/><path d="M30 40V18M36 40V24M58 40V14M86 40V22" stroke="#15151c" stroke-width="4" stroke-linecap="round"/></svg>',
+    custom:'<svg viewBox="0 0 120 90"><path d="M60 10l38 20v34L60 84 22 64V30z" fill="#c9ccd3" stroke="#15151c" stroke-width="3"/><path d="M60 46l38-16M60 46L22 30M60 46v38" stroke="#15151c" stroke-width="3"/><path d="M60 22l3 7 7 2-7 2-3 7-3-7-7-2 7-2z" fill="#ff6a1a"/></svg>'
+  };
+  var DEFAULTS = {
+    p1:{name:"ميدالية باسمك", desc:"ميدالية مفاتيح بالاسم أو الكلمة اللي تبيها، بلونين.", art:"keychain", colors:["black","white","red","orange","blue","purple","pink","gold"], sizes:[], personal:true, personalLabel:"الاسم اللي ينطبع", custom:false, visible:true, order:1},
+    p2:{name:"ستاند جوال", desc:"ستاند ثابت للمكتب، يناسب أغلب الجوالات.", art:"stand", colors:["black","white","grey","blue","green"], sizes:[], personal:false, custom:false, visible:true, order:2},
+    p3:{name:"لوحة اسم للمكتب", desc:"لوحة اسم واقفة، مثالية للمكتب أو هدية.", art:"nameplate", colors:["black","white","green","gold","silver"], sizes:["صغير","وسط","كبير"], personal:true, personalLabel:"الاسم أو المسمّى", custom:false, visible:true, order:3},
+    p4:{name:"مزهرية حلزونية", desc:"مزهرية بتصميم ملتف، للزينة أو للورد الصناعي.", art:"vase", colors:["white","purple","pink","gold","silver"], sizes:["صغير","وسط","كبير"], personal:false, custom:false, visible:true, order:4},
+    p5:{name:"منظّم مكتب", desc:"منظّم بثلاث خانات للأقلام والأغراض الصغيرة.", art:"organizer", colors:["black","white","yellow","orange","grey"], sizes:[], personal:false, custom:false, visible:true, order:5},
+    p6:{name:"مجسّم حسب الطلب", desc:"عندك تصميم أو فكرة؟ أرسل الرابط ونطبعه لك.", art:"custom", colors:COLORS.map(function(c){ return c.id; }), sizes:["صغير","وسط","كبير"], personal:false, custom:true, visible:true, order:6}
+  };
+
+  function $(id){ return document.getElementById(id); }
+  function el(tag, cls, text){ var e = document.createElement(tag); if(cls) e.className = cls; if(text != null) e.textContent = text; return e; }
+  function lsGet(k){ try{ return localStorage.getItem(k); }catch(e){ return null; } }
+  function lsSet(k, v){ try{ localStorage.setItem(k, v); }catch(e){} }
+  function str(v, n){ return typeof v === "string" ? v.slice(0, n || 400) : ""; }
+  function arr(v){ return Array.isArray(v) ? v.filter(function(x){ return typeof x === "string"; }).slice(0, 40) : []; }
+  function safeImg(src){ return typeof src === "string" && (src.indexOf("data:image/") === 0 || src.indexOf("https://") === 0) ? src : ""; }
+  function toast(t){ var e = $("toast"); e.textContent = t; e.hidden = false; clearTimeout(toast._t); toast._t = setTimeout(function(){ e.hidden = true; }, 2600); }
+
+  function url(path){ return FB + ROOT + (path ? "/" + path : "") + ".json"; }
+  async function fbGet(path){ var r = await fetch(url(path), {cache:"no-store"}); if(!r.ok) throw new Error("http " + r.status); return await r.json(); }
+  async function fbPut(path, val){ var r = await fetch(url(path), {method:"PUT", headers:{"Content-Type":"application/json"}, body:JSON.stringify(val)}); if(!r.ok) throw new Error("http " + r.status); }
+  async function fbPatch(path, val){ var r = await fetch(url(path), {method:"PATCH", headers:{"Content-Type":"application/json"}, body:JSON.stringify(val)}); if(!r.ok) throw new Error("http " + r.status); }
+  async function fbDel(path){ var r = await fetch(url(path), {method:"DELETE"}); if(!r.ok) throw new Error("http " + r.status); }
+  async function sha(s){ var b = await crypto.subtle.digest("SHA-256", new TextEncoder().encode(s)); return Array.from(new Uint8Array(b), function(x){ return x.toString(16).padStart(2,"0"); }).join(""); }
+
+  var products = {}, usingDefaults = true, isAdmin = false, orders = {};
+
+  function normProducts(raw){
+    var out = {};
+    Object.keys(raw || {}).forEach(function(id){
+      var p = raw[id]; if(!p || typeof p !== "object") return;
+      out[id] = {name:str(p.name,60) || "منتج", desc:str(p.desc,220), art:str(p.art,20), photo:safeImg(p.photo),
+        colors:arr(p.colors).filter(function(c){ return COLOR[c]; }), sizes:arr(p.sizes).map(function(s){ return s.slice(0,30); }),
+        personal:!!p.personal, personalLabel:str(p.personalLabel,40), custom:!!p.custom, visible:p.visible !== false, order:Number(p.order) || 99};
+    });
+    return out;
+  }
+  function sortedIds(map, all){
+    return Object.keys(map).filter(function(id){ return all || map[id].visible; }).sort(function(a,b){ return map[a].order - map[b].order || map[a].name.localeCompare(map[b].name); });
+  }
+  function artFor(p, holder){
+    holder.textContent = "";
+    if(p.photo){ var img = el("img"); img.src = p.photo; img.alt = ""; img.loading = "lazy"; holder.appendChild(img); }
+    else { holder.innerHTML = ART[p.art] || ART.custom; }
+  }
+
+  // ---------- catalog ----------
+  function renderGrid(){
+    var g = $("grid"); g.textContent = "";
+    var ids = sortedIds(products, false);
+    if(!ids.length){ g.appendChild(el("p","empty","المنتجات بتنزل قريب.")); return; }
+    ids.forEach(function(id){
+      var p = products[id];
+      var c = el("article","card");
+      var ph = el("div","ph"); artFor(p, ph); c.appendChild(ph);
+      var b = el("div","body");
+      if(p.personal) b.appendChild(el("span","tag","بالاسم"));
+      else if(p.custom) b.appendChild(el("span","tag","تصميمك"));
+      b.appendChild(el("h3","",p.name));
+      if(p.desc) b.appendChild(el("p","",p.desc));
+      if(p.colors.length){
+        var d = el("div","dots"); d.setAttribute("aria-label", p.colors.length + " ألوان");
+        p.colors.slice(0,10).forEach(function(cid){ var i = el("i"); i.style.background = COLOR[cid].hex; i.title = COLOR[cid].name; d.appendChild(i); });
+        b.appendChild(d);
+      }
+      var btn = el("button","btn primary","اطلب"); btn.type = "button";
+      btn.addEventListener("click", function(){ openOrder(id); });
+      b.appendChild(btn);
+      c.appendChild(b); g.appendChild(c);
+    });
+  }
+
+  // ---------- order sheet ----------
+  var cur = null, pick = {color:"", size:"", qty:1}, lastFocus = null;
+  function openSheet(sheet){ lastFocus = document.activeElement; $("scrim").hidden = false; sheet.hidden = false; document.body.style.overflow = "hidden"; setTimeout(function(){ var f = sheet.querySelector("input,button.x"); if(f) f.focus(); }, 60); }
+  function closeSheets(){ $("scrim").hidden = true; $("sheet").hidden = true; $("psheet").hidden = true; document.body.style.overflow = ""; if(lastFocus && lastFocus.focus) lastFocus.focus(); }
+  $("scrim").addEventListener("click", closeSheets);
+  $("sh-close").addEventListener("click", closeSheets);
+  $("ps-close").addEventListener("click", closeSheets);
+  document.addEventListener("keydown", function(e){ if(e.key === "Escape" && !$("scrim").hidden) closeSheets(); });
+
+  function openOrder(id){
+    cur = id; var p = products[id];
+    pick = {color: p.colors.length === 1 ? p.colors[0] : "", size: p.sizes.length === 1 ? p.sizes[0] : "", qty:1};
+    $("sh-title").textContent = p.name; artFor(p, $("sh-thumb"));
+    $("sh-form").hidden = false; $("sh-done").hidden = true;
+    $("f-color").hidden = !p.colors.length; $("f-size").hidden = !p.sizes.length;
+    $("f-text").hidden = !p.personal; $("o-text-lbl").textContent = p.personalLabel || "النص اللي ينطبع"; $("o-text").value = "";
+    $("f-link").hidden = !p.custom; $("o-link").value = "";
+    $("o-notes").value = ""; $("q-val").textContent = "1"; $("o-msg").textContent = ""; $("o-msg").className = "msg";
+    $("o-name").value = lsGet("7z-name") || ""; $("o-phone").value = lsGet("7z-phone") || ""; $("o-city").value = lsGet("7z-city") || "";
+    renderPickers();
+    openSheet($("sheet"));
+  }
+  function renderPickers(){
+    var p = products[cur], sw = $("sw"), sz = $("sizes");
+    sw.textContent = "";
+    p.colors.forEach(function(cid){
+      var c = COLOR[cid], b = el("button","sw"); b.type = "button"; b.setAttribute("aria-pressed", pick.color === cid ? "true" : "false");
+      var i = el("i"); i.style.background = c.hex; b.appendChild(i); b.appendChild(el("span","",c.name));
+      b.addEventListener("click", function(){ pick.color = cid; renderPickers(); });
+      sw.appendChild(b);
+    });
+    sz.textContent = "";
+    p.sizes.forEach(function(s){
+      var b = el("button","pill",s); b.type = "button"; b.setAttribute("aria-pressed", pick.size === s ? "true" : "false");
+      b.addEventListener("click", function(){ pick.size = s; renderPickers(); });
+      sz.appendChild(b);
+    });
+  }
+  $("q-minus").addEventListener("click", function(){ pick.qty = Math.max(1, pick.qty - 1); $("q-val").textContent = pick.qty; });
+  $("q-plus").addEventListener("click", function(){ pick.qty = Math.min(50, pick.qty + 1); $("q-val").textContent = pick.qty; });
+
+  function phoneDigits(v){ var d = String(v || "").replace(/[^\d+]/g,""); return d; }
+  function waLink(v){
+    var d = String(v || "").replace(/\D/g,"");
+    if(d.indexOf("00") === 0) d = d.slice(2);
+    if(d.indexOf("0") === 0 && d.length === 10) d = "971" + d.slice(1);
+    else if(d.length === 9 && d[0] === "5") d = "971" + d;
+    return "https://wa.me/" + d;
+  }
+  function genCode(){ var a = new Uint32Array(1); crypto.getRandomValues(a); return "7Z-" + String(1000 + (a[0] % 9000)); }
+
+  $("o-send").addEventListener("click", async function(){
+    var p = products[cur], msg = $("o-msg"); msg.className = "msg err";
+    if(p.colors.length && !pick.color){ msg.textContent = "اختار اللون."; return; }
+    if(p.sizes.length && !pick.size){ msg.textContent = "اختار المقاس."; return; }
+    var text = $("o-text").value.trim();
+    if(p.personal && !text){ msg.textContent = "اكتب " + (p.personalLabel || "النص اللي ينطبع") + "."; $("o-text").focus(); return; }
+    var name = $("o-name").value.trim(), phone = phoneDigits($("o-phone").value), city = $("o-city").value;
+    if(!name){ msg.textContent = "اكتب اسمك."; $("o-name").focus(); return; }
+    if(phone.replace(/\D/g,"").length < 9){ msg.textContent = "اكتب رقم واتساب صحيح."; $("o-phone").focus(); return; }
+    if(!city){ msg.textContent = "اختار الإمارة."; $("o-city").focus(); return; }
+    var link = $("o-link").value.trim(); if(link && link.indexOf("https://") !== 0) link = "";
+    var btn = $("o-send"); btn.disabled = true; msg.className = "msg"; msg.textContent = "لحظة، نرسل الطلب...";
+    var order = {productId:cur, productName:p.name, color:pick.color, size:pick.size, text:text.slice(0,40), link:link.slice(0,300), qty:pick.qty,
+      name:name.slice(0,40), phone:phone.slice(0,20), city:city, notes:$("o-notes").value.trim().slice(0,400), status:"new", createdAt:Date.now(), updatedAt:Date.now()};
+    try{
+      var code = genCode(), tries = 0;
+      while(tries < 5){ var ex = await fbGet("orders/" + code); if(!ex) break; code = genCode(); tries++; }
+      await fbPut("orders/" + code, order);
+      lsSet("7z-name", order.name); lsSet("7z-phone", order.phone); lsSet("7z-city", city);
+      var mine = []; try{ mine = JSON.parse(lsGet("7z-orders") || "[]"); }catch(e){} mine.unshift(code); lsSet("7z-orders", JSON.stringify(mine.slice(0,20)));
+      notifyOwner(code, order);
+      $("done-code").textContent = code; $("sh-form").hidden = true; $("sh-done").hidden = false;
+      confetti();
+    }catch(e){
+      msg.className = "msg err"; msg.textContent = "ما قدرنا نرسل الطلب. تأكد من الإنترنت وجرّب مرة ثانية.";
+    }
+    btn.disabled = false;
+  });
+  function notifyOwner(code, o){
+    try{
+      var lines = [o.productName + (o.qty > 1 ? " × " + o.qty : "")];
+      if(o.color && COLOR[o.color]) lines.push("اللون: " + COLOR[o.color].name);
+      if(o.size) lines.push("المقاس: " + o.size);
+      if(o.text) lines.push("النص: " + o.text);
+      lines.push(o.name + " · " + o.city);
+      fetch("https://ntfy.sh/", {method:"POST", headers:{"Content-Type":"application/json"}, keepalive:true,
+        body:JSON.stringify({topic:NTFY_TOPIC, title:"طلب جديد " + code, message:lines.join("\n"), tags:["package"], click:waLink(o.phone)})}).catch(function(){});
+    }catch(e){}
+  }
+  $("copy-code").addEventListener("click", function(){
+    var t = $("done-code").textContent;
+    try{ navigator.clipboard.writeText(t).then(function(){ toast("اننسخ الرقم"); }).catch(function(){ toast(t); }); }catch(e){ toast(t); }
+  });
+  $("go-track").addEventListener("click", function(){ var c = $("done-code").textContent; closeSheets(); $("track-code").value = c; location.hash = "track"; doTrack(); });
+
+  // ---------- tracking ----------
+  async function doTrack(){
+    var code = $("track-code").value.trim().toUpperCase().replace(/\s+/g,"");
+    if(/^\d{4}$/.test(code)) code = "7Z-" + code;
+    if(/^7Z\d{4}$/.test(code)) code = "7Z-" + code.slice(2);
+    var m = $("track-msg"), out = $("track-out"); out.textContent = ""; m.className = "msg";
+    if(!/^7Z-\d{4}$/.test(code)){ m.className = "msg err"; m.textContent = "رقم الطلب يكون مثل 7Z-1234."; return; }
+    m.textContent = "لحظة...";
+    try{
+      var o = await fbGet("orders/" + code);
+      if(!o || typeof o !== "object"){ m.className = "msg err"; m.textContent = "ما لقينا طلب بهالرقم. تأكد منه."; return; }
+      m.textContent = "";
+      var s = ST[o.status] ? o.status : "new";
+      var sum = el("dl","summary");
+      function row(k, v){ if(!v) return; sum.appendChild(el("dt","",k)); sum.appendChild(el("dd","",v)); }
+      row("رقم الطلب", code); row("المنتج", str(o.productName,60) + (Number(o.qty) > 1 ? " × " + Number(o.qty) : ""));
+      row("اللون", COLOR[o.color] ? COLOR[o.color].name : ""); row("المقاس", str(o.size,30)); row("النص", str(o.text,40));
+      out.appendChild(sum);
+      var tl = el("ol","timeline");
+      if(s === "cancelled"){
+        var li = el("li","now"); li.appendChild(el("span","dot")); var d = el("div"); d.appendChild(el("b","",CANCELLED.name)); d.appendChild(el("span","","تواصل معانا إذا عندك سؤال.")); li.appendChild(d); tl.appendChild(li);
+      } else {
+        var idx = STATUSES.findIndex(function(x){ return x.id === s; });
+        STATUSES.forEach(function(st, i){
+          var li = el("li", i < idx ? "done" : (i === idx ? "now" : "")); li.appendChild(el("span","dot"));
+          var d = el("div"); d.appendChild(el("b","",st.name)); d.appendChild(el("span","",st.hint)); li.appendChild(d); tl.appendChild(li);
+        });
+      }
+      out.appendChild(tl);
+    }catch(e){ m.className = "msg err"; m.textContent = "ما قدرنا نوصل للطلبات الحين. جرّب بعد شوي."; }
+  }
+  $("track-btn").addEventListener("click", doTrack);
+  $("track-code").addEventListener("keydown", function(e){ if(e.key === "Enter") doTrack(); });
+
+  // ---------- admin ----------
+  var filter = "active";
+  function setTab(t){
+    $("tab-orders").setAttribute("aria-selected", t === "orders" ? "true" : "false");
+    $("tab-products").setAttribute("aria-selected", t === "products" ? "true" : "false");
+    $("panel-orders").hidden = t !== "orders"; $("panel-products").hidden = t !== "products";
+  }
+  $("tab-orders").addEventListener("click", function(){ setTab("orders"); });
+  $("tab-products").addEventListener("click", function(){ setTab("products"); });
+
+  function renderFilters(){
+    var f = $("filters"); f.textContent = "";
+    [["active","الشغالة"],["new","جديد"],["printing","قيد الطباعة"],["ready","جاهز"],["delivered","تم التسليم"],["cancelled","ملغي"],["all","الكل"]].forEach(function(x){
+      var b = el("button","pill",x[1]); b.type = "button"; b.setAttribute("aria-pressed", filter === x[0] ? "true" : "false");
+      b.addEventListener("click", function(){ filter = x[0]; renderFilters(); renderOrders(); });
+      f.appendChild(b);
+    });
+  }
+  function renderOrders(){
+    var box = $("orders"); box.textContent = "";
+    var codes = Object.keys(orders).sort(function(a,b){ return (orders[b].createdAt||0) - (orders[a].createdAt||0); });
+    var nNew = codes.filter(function(c){ return orders[c].status === "new"; }).length;
+    $("new-count").textContent = nNew ? "(" + nNew + ")" : "";
+    $("orders-sum").textContent = codes.length ? codes.length + " طلب، منها " + nNew + " جديد" : "";
+    var shown = codes.filter(function(c){
+      var s = orders[c].status || "new";
+      if(filter === "all") return true;
+      if(filter === "active") return s !== "delivered" && s !== "cancelled";
+      return s === filter;
+    });
+    if(!shown.length){ box.appendChild(el("p","empty", codes.length ? "ما في طلبات هني." : "ما وصلت طلبات للحين. أول ما يطلب أحد بيطلع هني، ويوصلك تنبيه.")); return; }
+    shown.forEach(function(code){
+      var o = orders[code], s = ST[o.status] ? o.status : "new";
+      var c = el("article","order"); c.style.setProperty("--st", ST[s].color);
+      var top = el("div","o-top"); top.appendChild(el("span","o-code",code));
+      var stag = el("span","st",ST[s].name); stag.style.setProperty("--st", ST[s].color); top.appendChild(stag); c.appendChild(top);
+      c.appendChild(el("span","o-time", o.createdAt ? new Date(o.createdAt).toLocaleString("ar-AE", {dateStyle:"medium", timeStyle:"short"}) : ""));
+      var dl = el("dl");
+      function row(k, v){ if(!v) return; dl.appendChild(el("dt","",k)); dl.appendChild(el("dd","",v)); }
+      row("المنتج", str(o.productName,60) + (Number(o.qty) > 1 ? " × " + Number(o.qty) : ""));
+      row("اللون", COLOR[o.color] ? COLOR[o.color].name : ""); row("المقاس", str(o.size,30)); row("النص", str(o.text,40));
+      row("الاسم", str(o.name,40)); row("الإمارة", str(o.city,20)); row("ملاحظات", str(o.notes,400));
+      c.appendChild(dl);
+      var lk = str(o.link,300);
+      if(lk.indexOf("https://") === 0){ var a = el("a","", "رابط المجسّم"); a.href = lk; a.target = "_blank"; a.rel = "noopener"; a.style.fontWeight = "700"; a.style.color = "var(--violet)"; c.appendChild(a); }
+      var acts = el("div","o-acts");
+      var wa = el("a","btn primary small","واتساب"); wa.href = waLink(o.phone); wa.target = "_blank"; wa.rel = "noopener"; acts.appendChild(wa);
+      var sel = el("select"); sel.setAttribute("aria-label","حالة الطلب");
+      STATUSES.concat([CANCELLED]).forEach(function(st){ var op = el("option","",st.name); op.value = st.id; sel.appendChild(op); });
+      sel.value = s;
+      sel.addEventListener("change", async function(){
+        sel.disabled = true;
+        try{ await fbPatch("orders/" + code, {status:sel.value, updatedAt:Date.now()}); orders[code].status = sel.value; toast("تحدّثت الحالة"); renderOrders(); }
+        catch(e){ toast("ما تحدّثت، جرّب مرة ثانية"); sel.value = s; sel.disabled = false; }
+      });
+      acts.appendChild(sel);
+      var del = el("button","del","احذف"); del.type = "button"; var armed = false, t = null;
+      del.addEventListener("click", async function(){
+        if(!armed){ armed = true; del.classList.add("armed"); del.textContent = "متأكد؟"; t = setTimeout(function(){ armed = false; del.classList.remove("armed"); del.textContent = "احذف"; }, 4000); return; }
+        clearTimeout(t); del.disabled = true;
+        try{ await fbDel("orders/" + code); delete orders[code]; toast("انحذف الطلب"); renderOrders(); }catch(e){ toast("ما انحذف"); del.disabled = false; }
+      });
+      acts.appendChild(del);
+      c.appendChild(acts);
+      box.appendChild(c);
+    });
+  }
+  async function loadOrders(silent){
+    try{
+      var o = await fbGet("orders");
+      var prev = Object.keys(orders).length;
+      orders = (o && typeof o === "object") ? o : {};
+      renderOrders();
+      if(silent && Object.keys(orders).length > prev && prev) toast("وصلك طلب جديد");
+    }catch(e){ if(!silent) $("orders").textContent = "ما قدرنا نجيب الطلبات. تأكد من الإنترنت."; }
+  }
+
+  // products admin
+  function renderPList(){
+    var l = $("plist"); l.textContent = "";
+    $("prod-note").textContent = usingDefaults ? "هذي منتجات تجريبية للعرض. عدّلها أو احذفها وزيد منتجاتك، وأول ما تحفظ تصير منتجاتك إنت." : "";
+    var ids = sortedIds(products, true);
+    if(!ids.length){ l.appendChild(el("p","empty","ما في منتجات. اضغط \"منتج جديد\".")); return; }
+    ids.forEach(function(id, i){
+      var p = products[id], it = el("div","pitem");
+      var th = el("div","thumb"); artFor(p, th); it.appendChild(th);
+      var inf = el("div","info"); inf.appendChild(el("b","",p.name)); inf.appendChild(el("span","", (p.visible ? "ظاهر" : "مخفي") + " · " + p.colors.length + " ألوان" + (p.sizes.length ? " · " + p.sizes.join("، ") : ""))); it.appendChild(inf);
+      var up = el("button","btn ghost small","▲"); up.type = "button"; up.setAttribute("aria-label","فوق"); up.disabled = i === 0;
+      up.addEventListener("click", function(){ swapOrder(ids, i, i - 1); });
+      var dn = el("button","btn ghost small","▼"); dn.type = "button"; dn.setAttribute("aria-label","تحت"); dn.disabled = i === ids.length - 1;
+      dn.addEventListener("click", function(){ swapOrder(ids, i, i + 1); });
+      var ed = el("button","btn dark small","عدّل"); ed.type = "button"; ed.addEventListener("click", function(){ openEditor(id); });
+      it.appendChild(up); it.appendChild(dn); it.appendChild(ed);
+      l.appendChild(it);
+    });
+  }
+  async function ensureSeeded(){
+    if(!usingDefaults) return;
+    var payload = {}; Object.keys(products).forEach(function(id){ payload[id] = products[id]; });
+    await fbPut("products", payload); usingDefaults = false;
+  }
+  async function swapOrder(ids, a, b){
+    try{
+      await ensureSeeded();
+      ids.forEach(function(id, i){ products[id].order = i + 1; });
+      var oa = products[ids[a]].order; products[ids[a]].order = products[ids[b]].order; products[ids[b]].order = oa;
+      var patch = {}; ids.forEach(function(id){ patch[id + "/order"] = products[id].order; });
+      await fbPatch("products", patch); renderPList(); renderGrid();
+    }catch(e){ toast("ما انحفظ الترتيب"); }
+  }
+  var editing = null, editPhoto = "";
+  function renderColorChecks(selected){
+    var box = $("p-colors"); box.textContent = "";
+    COLORS.forEach(function(c){
+      var lab = el("label"); var cb = el("input"); cb.type = "checkbox"; cb.value = c.id; cb.checked = selected.indexOf(c.id) >= 0;
+      var i = el("i"); i.style.background = c.hex; lab.appendChild(cb); lab.appendChild(i); lab.appendChild(document.createTextNode(c.name)); box.appendChild(lab);
+    });
+  }
+  function syncPersonal(){ $("p-personal-lbl-f").hidden = !$("p-personal").checked; }
+  $("p-personal").addEventListener("change", syncPersonal);
+  function openEditor(id){
+    editing = id || null;
+    var p = id ? products[id] : {name:"", desc:"", art:"custom", photo:"", colors:["black","white"], sizes:[], personal:false, personalLabel:"", custom:false, visible:true};
+    $("ps-title").textContent = id ? "عدّل المنتج" : "منتج جديد";
+    $("p-name").value = p.name; $("p-desc").value = p.desc; $("p-sizes").value = p.sizes.join("، ");
+    $("p-personal").checked = p.personal; $("p-personal-lbl").value = p.personalLabel || ""; $("p-custom").checked = p.custom; $("p-visible").checked = p.visible;
+    editPhoto = p.photo || ""; showEditThumb(p);
+    renderColorChecks(p.colors); syncPersonal();
+    $("p-del").hidden = !id; $("p-msg").textContent = ""; $("p-msg").className = "msg";
+    $("p-del").classList.remove("armed"); $("p-del").textContent = "احذف المنتج"; delArmed = false;
+    openSheet($("psheet"));
+  }
+  function showEditThumb(p){ var t = $("p-thumb"); artFor({photo:editPhoto, art:(p && p.art) || "custom"}, t); }
+  $("add-product").addEventListener("click", function(){ openEditor(null); });
+  $("p-photo").addEventListener("change", function(e){
+    var f = e.target.files && e.target.files[0]; if(!f) return;
+    var img = new Image(), u = URL.createObjectURL(f);
+    img.onload = function(){
+      var max = 900, w = img.naturalWidth, h = img.naturalHeight, s = Math.min(1, max / Math.max(w, h));
+      var cv = document.createElement("canvas"); cv.width = Math.round(w * s); cv.height = Math.round(h * s);
+      cv.getContext("2d").drawImage(img, 0, 0, cv.width, cv.height);
+      editPhoto = cv.toDataURL("image/jpeg", 0.8); URL.revokeObjectURL(u);
+      showEditThumb(editing ? products[editing] : null);
+    };
+    img.onerror = function(){ toast("ما قدرنا نقرأ الصورة"); URL.revokeObjectURL(u); };
+    img.src = u; e.target.value = "";
+  });
+  $("p-photo-clear").addEventListener("click", function(){ editPhoto = ""; showEditThumb(editing ? products[editing] : null); });
+  $("p-save").addEventListener("click", async function(){
+    var m = $("p-msg"), name = $("p-name").value.trim();
+    if(!name){ m.className = "msg err"; m.textContent = "اكتب اسم المنتج."; $("p-name").focus(); return; }
+    var colors = Array.from($("p-colors").querySelectorAll("input:checked")).map(function(c){ return c.value; });
+    var sizes = $("p-sizes").value.split(/[,،]/).map(function(s){ return s.trim().slice(0,30); }).filter(Boolean).slice(0,10);
+    var base = editing ? products[editing] : null;
+    var p = {name:name.slice(0,60), desc:$("p-desc").value.trim().slice(0,220), art:base ? base.art : "custom", photo:editPhoto, colors:colors, sizes:sizes,
+      personal:$("p-personal").checked, personalLabel:$("p-personal-lbl").value.trim().slice(0,40), custom:$("p-custom").checked, visible:$("p-visible").checked,
+      order: base ? base.order : (Math.max.apply(null, [0].concat(Object.keys(products).map(function(k){ return products[k].order; }))) + 1)};
+    var btn = $("p-save"); btn.disabled = true; m.className = "msg"; m.textContent = "لحظة...";
+    try{
+      await ensureSeeded();
+      var id = editing || ("p" + Date.now().toString(36));
+      await fbPut("products/" + id, p);
+      products[id] = normProducts({x:p}).x; products[id].photo = editPhoto;
+      closeSheets(); toast("انحفظ المنتج"); renderPList(); renderGrid();
+    }catch(e){ m.className = "msg err"; m.textContent = "ما انحفظ. إذا الصورة كبيرة جرّب صورة ثانية، أو تأكد من الإنترنت."; }
+    btn.disabled = false;
+  });
+  var delArmed = false, delT = null;
+  $("p-del").addEventListener("click", async function(){
+    var b = $("p-del");
+    if(!delArmed){ delArmed = true; b.classList.add("armed"); b.textContent = "متأكد؟ اضغط مرة ثانية"; delT = setTimeout(function(){ delArmed = false; b.classList.remove("armed"); b.textContent = "احذف المنتج"; }, 4000); return; }
+    clearTimeout(delT); b.disabled = true;
+    try{ await ensureSeeded(); await fbDel("products/" + editing); delete products[editing]; closeSheets(); toast("انحذف المنتج"); renderPList(); renderGrid(); }
+    catch(e){ toast("ما انحذف"); }
+    b.disabled = false; delArmed = false;
+  });
+
+  // ---------- confetti ----------
+  function confetti(){
+    var reduce = false; try{ reduce = window.matchMedia("(prefers-reduced-motion: reduce)").matches; }catch(e){}
+    if(reduce) return;
+    var cv = $("confetti"), ctx = cv.getContext && cv.getContext("2d"); if(!ctx) return;
+    var dpr = Math.min(window.devicePixelRatio || 1, 2), W = cv.clientWidth, H = cv.clientHeight;
+    cv.width = W * dpr; cv.height = H * dpr; ctx.setTransform(dpr,0,0,dpr,0,0);
+    var cols = ["#ff6a1a","#6c4cf5","#0f9d94","#ffd23f","#2f6fdf","#ff7eb6"], ps = [];
+    for(var i = 0; i < 120; i++){ var side = i % 2 ? 1 : -1; ps.push({x: side > 0 ? W*.1 : W*.9, y: H*.4, vx: side*(3+Math.random()*6), vy:-6-Math.random()*8, w:5+Math.random()*6, h:3+Math.random()*7, r:Math.random()*6, vr:(Math.random()-.5)*.4, c:cols[i % cols.length]}); }
+    var t0 = performance.now();
+    (function frame(t){
+      ctx.clearRect(0,0,W,H); var alive = false;
+      ps.forEach(function(p){ p.vy += .28; p.vx *= .99; p.x += p.vx; p.y += p.vy; p.r += p.vr; if(p.y < H + 20) alive = true; ctx.save(); ctx.translate(p.x,p.y); ctx.rotate(p.r); ctx.fillStyle = p.c; ctx.fillRect(-p.w/2,-p.h/2,p.w,p.h); ctx.restore(); });
+      if(alive && t - t0 < 4000) requestAnimationFrame(frame); else ctx.clearRect(0,0,W,H);
+    })(t0);
+  }
+
+  // ---------- boot ----------
+  async function loadProducts(){
+    try{
+      var raw = await fbGet("products");
+      if(raw && typeof raw === "object" && Object.keys(raw).length){ products = normProducts(raw); usingDefaults = false; }
+      else { products = normProducts(DEFAULTS); usingDefaults = true; }
+    }catch(e){ products = normProducts(DEFAULTS); usingDefaults = true; }
+  }
+  async function boot(){
+    products = normProducts(DEFAULTS); renderGrid();
+    var params = new URLSearchParams(location.search), key = params.get("admin");
+    if(key){ try{ isAdmin = (await sha(key)) === ADMIN_HASH; }catch(e){ isAdmin = false; } }
+    await loadProducts(); renderGrid();
+    if(isAdmin){
+      $("shop").hidden = true; $("shop-nav").hidden = true; $("admin").hidden = false; $("admin-bar").hidden = false;
+      document.title = "7zoom3D · الإدارة";
+      renderFilters(); renderPList(); await loadOrders(false);
+      setInterval(function(){ if(!document.hidden) loadOrders(true); }, 20000);
+    } else {
+      var q = params.get("order"); if(q){ $("track-code").value = q; doTrack(); }
+    }
+  }
+  boot();
+})();
+</script>
+</body>
+</html>
