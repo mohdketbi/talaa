@@ -83,7 +83,17 @@ button{font:inherit}
 .btn.small{padding:7px 14px; border-radius:10px; font-size:.92rem}
 .btn:disabled{opacity:.5; cursor:not-allowed}
 .printer{position:relative; aspect-ratio:1/1; max-width:420px; width:100%; justify-self:center; background:var(--surface); border:1px solid var(--line); border-radius:28px; box-shadow:var(--shadow); overflow:hidden}
-.printer svg{display:block; width:100%; height:100%}
+.printer canvas{display:block; width:100%; height:100%}
+.printer{background:radial-gradient(circle at 50% 38%, var(--surface) 0 45%, var(--soft) 100%)}
+.printer::before{content:""; position:absolute; left:18%; right:18%; bottom:13%; height:7%; border-radius:50%; background:rgba(21,21,28,.12); filter:blur(8px)}
+.hero-cols{position:absolute; left:0; right:0; bottom:14px; display:flex; justify-content:center; gap:8px; flex-wrap:wrap; padding:0 12px}
+.hero-cols button{width:26px; height:26px; border-radius:50%; border:2px solid var(--surface); box-shadow:0 0 0 1px var(--line); cursor:pointer; padding:0}
+.hero-cols button[aria-pressed="true"]{box-shadow:0 0 0 2px var(--ink)}
+.printer .hint, .viewer .hint{position:absolute; top:12px; right:14px; font-size:.78rem; font-weight:700; color:var(--muted); background:var(--surface); border:1px solid var(--line); border-radius:999px; padding:2px 10px}
+.card .ph canvas{width:100%; height:100%; display:block; position:relative; z-index:1}
+.viewer{position:relative; height:230px; margin:0 max(18px, env(safe-area-inset-left,0px)) 0 max(18px, env(safe-area-inset-right,0px)); margin-top:14px; border-radius:18px; background:radial-gradient(circle at 50% 40%, var(--surface) 0 40%, var(--soft) 100%); border:1px solid var(--line); overflow:hidden}
+.viewer canvas{width:100%; height:100%; display:block}
+.viewer img{width:100%; height:100%; object-fit:contain; display:block}
 .printer .bed{fill:var(--soft)}
 .printer .frame{stroke:var(--ink)}
 .printer .layers rect{fill:var(--accent)}
@@ -267,28 +277,11 @@ footer .wrap{display:flex; justify-content:space-between; gap:12px; flex-wrap:wr
           <a class="btn ghost" href="#track">عندي طلب، أبي أتتبّعه</a>
         </div>
       </div>
-      <div class="printer" aria-hidden="true">
-        <svg viewBox="0 0 400 400">
-          <rect class="bed" x="70" y="318" width="260" height="18" rx="4"/>
-          <g class="frame" fill="none" stroke-width="6" stroke-linecap="round"><path d="M60 350V60h280v290"/><path d="M60 86h280"/></g>
-          <g class="layers">
-            <rect x="140" y="300" width="120" height="18" rx="3"/>
-            <rect x="146" y="282" width="108" height="18" rx="3"/>
-            <rect x="150" y="264" width="100" height="18" rx="3"/>
-            <rect x="152" y="246" width="96" height="18" rx="3"/>
-            <rect x="150" y="228" width="100" height="18" rx="3"/>
-            <rect x="146" y="210" width="108" height="18" rx="3"/>
-            <rect x="142" y="192" width="116" height="18" rx="3"/>
-            <rect x="146" y="174" width="108" height="18" rx="3"/>
-            <rect x="156" y="156" width="88" height="18" rx="3"/>
-            <rect x="168" y="138" width="64" height="18" rx="3"/>
-          </g>
-          <g class="head">
-            <rect x="222" y="74" width="16" height="24" rx="3" fill="#6c4cf5"/>
-            <rect x="200" y="98" width="60" height="30" rx="8" fill="#15151c"/>
-            <path d="M222 128h16l-8 10z" fill="#15151c"/>
-          </g>
-        </svg>
+      <div class="printer">
+        <canvas id="hero3d" aria-label="مزهرية مطبوعة ثلاثية الأبعاد، اسحبها عشان تلفها" role="img"></canvas>
+        <div class="hero-cols" id="hero-cols" aria-label="جرّب الألوان"></div>
+        <span class="hint">اسحب عشان تلف</span>
+      </div>
       </div>
     </div>
   </section>
@@ -359,6 +352,7 @@ footer .wrap{display:flex; justify-content:space-between; gap:12px; flex-wrap:wr
   <div class="grab" aria-hidden="true"></div>
   <div class="sh-head"><div class="thumb" id="sh-thumb"></div><h3 id="sh-title"></h3><button type="button" class="x" id="sh-close" aria-label="سكّر">×</button></div>
   <div id="sh-form">
+    <div class="viewer" id="viewer"></div>
     <div class="form">
       <div class="field" id="f-color"><span class="lbl">اللون</span><div class="swatches" id="sw"></div></div>
       <div class="field" id="f-size"><span class="lbl">المقاس</span><div class="pills" id="sizes"></div></div>
@@ -494,21 +488,196 @@ footer .wrap{display:flex; justify-content:space-between; gap:12px; flex-wrap:wr
   function sortedIds(map, all){
     return Object.keys(map).filter(function(id){ return all || map[id].visible; }).sort(function(a,b){ return map[a].order - map[b].order || map[a].name.localeCompare(map[b].name); });
   }
+  function firstHex(p){ var c = p.colors && p.colors.length ? COLOR[p.colors[0]] : null; return c ? c.hex : "#ff6a1a"; }
   function artFor(p, holder){
     holder.textContent = "";
     if(p.photo){ var img = el("img"); img.src = p.photo; img.alt = ""; img.loading = "lazy"; holder.appendChild(img); }
     else { holder.innerHTML = ART[p.art] || ART.custom; }
   }
+  var cardViews = [];
+  function art3D(p, holder){
+    if(p.photo){ artFor(p, holder); return null; }
+    holder.textContent = "";
+    var cv = el("canvas"); cv.setAttribute("role","img"); cv.setAttribute("aria-label", p.name); holder.appendChild(cv);
+    var v = M3.view(cv, p.art || "custom", {color:firstHex(p), spin:false, yaw:-0.6, pitch:0.35, scale:0.3});
+    holder.addEventListener("pointerenter", function(){ v.hover(true); });
+    holder.addEventListener("pointerleave", function(){ v.hover(false); });
+    return v;
+  }
+
+  // ---------- Mini 3D: flat-shaded canvas renderer for the product models ----------
+  var M3 = (function(){
+    function hexRgb(h){ h = String(h || "#888888").replace("#",""); return [parseInt(h.slice(0,2),16), parseInt(h.slice(2,4),16), parseInt(h.slice(4,6),16)]; }
+    var TONES = {1:[34,34,42], 2:[172,176,186], 3:[246,246,242]};
+    function sub(a,b){ return [a[0]-b[0], a[1]-b[1], a[2]-b[2]]; }
+    function cross(a,b){ return [a[1]*b[2]-a[2]*b[1], a[2]*b[0]-a[0]*b[2], a[0]*b[1]-a[1]*b[0]]; }
+    function dot(a,b){ return a[0]*b[0]+a[1]*b[1]+a[2]*b[2]; }
+    function norm(a){ var l = Math.hypot(a[0],a[1],a[2]) || 1; return [a[0]/l, a[1]/l, a[2]/l]; }
+    // part: {v:[[x,y,z]], f:[[a,b,c,tone,layer]]}; orient faces outward relative to inside(point)
+    function orient(part, inside){
+      part.f.forEach(function(f){
+        var A = part.v[f[0]], B = part.v[f[1]], C = part.v[f[2]];
+        var n = cross(sub(B,A), sub(C,A)), c = [(A[0]+B[0]+C[0])/3, (A[1]+B[1]+C[1])/3, (A[2]+B[2]+C[2])/3];
+        if(dot(n, sub(c, inside(c))) < 0){ var t = f[1]; f[1] = f[2]; f[2] = t; }
+      });
+      return part;
+    }
+    function xf(part, fn){ part.v = part.v.map(fn); return part; }
+    function rotX(a){ var c = Math.cos(a), s = Math.sin(a); return function(p){ return [p[0], p[1]*c - p[2]*s, p[1]*s + p[2]*c]; }; }
+    function move(dx,dy,dz){ return function(p){ return [p[0]+dx, p[1]+dy, p[2]+dz]; }; }
+    function box(x0,y0,z0,x1,y1,z1,tone){
+      var v = [[x0,y0,z0],[x1,y0,z0],[x1,y1,z0],[x0,y1,z0],[x0,y0,z1],[x1,y0,z1],[x1,y1,z1],[x0,y1,z1]];
+      var q = [[0,1,2,3],[4,5,6,7],[0,1,5,4],[3,2,6,7],[0,3,7,4],[1,2,6,5]], f = [];
+      q.forEach(function(r){ f.push([r[0],r[1],r[2],tone,0]); f.push([r[0],r[2],r[3],tone,0]); });
+      var c = [(x0+x1)/2,(y0+y1)/2,(z0+z1)/2];
+      return orient({v:v, f:f}, function(){ return c; });
+    }
+    // lathe around Y; rf(y,a) gives radius; rows = list of y values
+    function lathe(rows, seg, rf, tone, cx, cz){
+      cx = cx || 0; cz = cz || 0;
+      var v = [], f = [];
+      rows.forEach(function(y){ for(var j = 0; j < seg; j++){ var a = j / seg * Math.PI * 2, r = rf(y, a); v.push([cx + Math.cos(a)*r, y, cz + Math.sin(a)*r]); } });
+      for(var i = 0; i < rows.length - 1; i++){
+        for(var j = 0; j < seg; j++){
+          var a0 = i*seg + j, a1 = i*seg + (j+1)%seg, b0 = (i+1)*seg + j, b1 = (i+1)*seg + (j+1)%seg;
+          f.push([a0,a1,b1,tone,i%2]); f.push([a0,b1,b0,tone,i%2]);
+        }
+      }
+      var bot = v.length; v.push([cx, rows[0], cz]); var top = v.length; v.push([cx, rows[rows.length-1], cz]);
+      var last = (rows.length-1)*seg;
+      for(var k = 0; k < seg; k++){ f.push([bot, k, (k+1)%seg, tone, 0]); f.push([top, last + (k+1)%seg, last + k, tone, 0]); }
+      var midY = (rows[0] + rows[rows.length-1]) / 2;
+      f.forEach(function(fc){
+        var A = v[fc[0]], B = v[fc[1]], C = v[fc[2]];
+        var n = cross(sub(B,A), sub(C,A)), c = [(A[0]+B[0]+C[0])/3, (A[1]+B[1]+C[1])/3, (A[2]+B[2]+C[2])/3];
+        var isCap = fc[0] === bot || fc[0] === top || fc[1] === bot || fc[1] === top || fc[2] === bot || fc[2] === top;
+        var ins = isCap ? [cx, midY, cz] : [cx, c[1], cz];
+        if(dot(n, sub(c, ins)) < 0){ var t = fc[1]; fc[1] = fc[2]; fc[2] = t; }
+      });
+      return {v:v, f:f};
+    }
+    function torus(cx,cy,cz,R,r,su,sv,tone){
+      var v = [], f = [];
+      for(var i = 0; i < su; i++){ var u = i/su*Math.PI*2; for(var j = 0; j < sv; j++){ var w = j/sv*Math.PI*2; v.push([cx + (R + r*Math.cos(w))*Math.cos(u), cy + (R + r*Math.cos(w))*Math.sin(u), cz + r*Math.sin(w)]); } }
+      for(var i2 = 0; i2 < su; i2++){ for(var j2 = 0; j2 < sv; j2++){ var a = i2*sv + j2, b = ((i2+1)%su)*sv + j2, c = ((i2+1)%su)*sv + (j2+1)%sv, d = i2*sv + (j2+1)%sv; f.push([a,b,c,tone,0]); f.push([a,c,d,tone,0]); } }
+      return orient({v:v, f:f}, function(p){ var ang = Math.atan2(p[1]-cy, p[0]-cx); return [cx + R*Math.cos(ang), cy + R*Math.sin(ang), cz]; });
+    }
+    function merge(parts){ var m = {v:[], f:[]}; parts.forEach(function(p){ var o = m.v.length; p.v.forEach(function(x){ m.v.push(x); }); p.f.forEach(function(f){ m.f.push([f[0]+o, f[1]+o, f[2]+o, f[3], f[4]]); }); }); return m; }
+    function range(a, b, n){ var out = []; for(var i = 0; i <= n; i++) out.push(a + (b-a)*i/n); return out; }
+
+    var BUILD = {
+      vase: function(){
+        return merge([lathe(range(0, 3.2, 30), 44, function(y, a){ var base = 0.75 + 0.45*Math.sin(y*1.05 + 0.3) - 0.08*y; return base * (1 + 0.11*Math.cos(6*a + 1.7*y)); }, 0)]);
+      },
+      keychain: function(){
+        return merge([
+          box(-1.7,-0.65,-0.16, 1.5,0.65,0.16, 0),
+          box(-0.75,-0.22,0.16, 1.25,0.22,0.32, 3),
+          torus(-1.95,0,0, 0.38,0.08, 24,8, 2),
+          box(-1.45,-0.12,-0.2, -1.2,0.12,0.2, 1)
+        ]);
+      },
+      stand: function(){
+        var back = xf(xf(box(-1,0,-0.1, 1,2.3,0.1, 0), rotX(-0.38)), move(0,0.22,-0.35));
+        return merge([box(-1.1,0,-0.9, 1.1,0.22,0.9, 0), back, box(-1,0.22,0.5, 1,0.55,0.66, 0), box(-0.35,0.22,-0.2, 0.35,0.36,0.5, 1)]);
+      },
+      nameplate: function(){
+        var plate = xf(xf(box(-1.7,0,-0.09, 1.7,1.15,0.09, 0), rotX(-0.28)), move(0,0.24,0));
+        var text = xf(xf(box(-1.1,0.42,0.09, 1.1,0.7,0.2, 3), rotX(-0.28)), move(0,0.24,0));
+        return merge([box(-1.9,0,-0.55, 1.9,0.24,0.55, 1), plate, text]);
+      },
+      organizer: function(){
+        var cyl = function(x, h){ return lathe(range(0.25, h, 10), 28, function(){ return 0.48; }, 0, x, 0); };
+        return merge([box(-1.65,0,-0.65, 1.65,0.25,0.65, 0), cyl(-1.05, 1.6), cyl(0, 2.2), cyl(1.05, 1.3)]);
+      },
+      custom: function(){
+        var prof = [[0,0],[0.7,0.35],[1.05,0.9],[1.1,1.3],[0.75,1.85],[0,2.05]];
+        var ys = prof.map(function(p){ return p[1]; });
+        return merge([lathe(ys, 8, function(y){ for(var i = 0; i < prof.length; i++){ if(Math.abs(prof[i][1]-y) < 1e-6) return Math.max(prof[i][0], 0.0001); } return 0.5; }, 0)]);
+      }
+    };
+    var cache = {};
+    function model(name){
+      if(!BUILD[name]) name = "custom";
+      if(!cache[name]){
+        var m = BUILD[name](), mn = [1e9,1e9,1e9], mx = [-1e9,-1e9,-1e9];
+        m.v.forEach(function(p){ for(var k = 0; k < 3; k++){ mn[k] = Math.min(mn[k], p[k]); mx[k] = Math.max(mx[k], p[k]); } });
+        var c = [(mn[0]+mx[0])/2, (mn[1]+mx[1])/2, (mn[2]+mx[2])/2], rad = 0;
+        m.v = m.v.map(function(p){ var q = [p[0]-c[0], p[1]-c[1], p[2]-c[2]]; rad = Math.max(rad, Math.hypot(q[0],q[1],q[2])); return q; });
+        m.rad = rad; cache[name] = m;
+      }
+      return cache[name];
+    }
+    var L = norm([-0.45, 0.8, 0.65]);
+    function draw(ctx, W, H, m, yaw, pitch, rgb, scale){
+      ctx.clearRect(0,0,W,H);
+      var cy = Math.cos(yaw), sy = Math.sin(yaw), cp = Math.cos(pitch), sp = Math.sin(pitch);
+      var s = Math.min(W, H) * (scale || 0.42) / m.rad, D = m.rad * 4.2;
+      var P = m.v.map(function(p){
+        var x = p[0]*cy + p[2]*sy, z = -p[0]*sy + p[2]*cy, y = p[1];
+        var y2 = y*cp - z*sp, z2 = y*sp + z*cp;
+        var k = D / (D - z2);
+        return [x, y2, z2, W/2 + x*s*k, H/2 - y2*s*k];
+      });
+      var list = [];
+      m.f.forEach(function(f){
+        var A = P[f[0]], B = P[f[1]], C = P[f[2]];
+        var n = norm(cross(sub(B,A), sub(C,A)));
+        var cen = [(A[0]+B[0]+C[0])/3, (A[1]+B[1]+C[1])/3, (A[2]+B[2]+C[2])/3];
+        if(dot(n, sub([0,0,D], cen)) <= 0) return;
+        list.push([cen[2] + (f[3] === 3 ? 100 : 0), f, n]);
+      });
+      list.sort(function(a,b){ return a[0] - b[0]; });
+      list.forEach(function(it){
+        var f = it[1], n = it[2], base = f[3] === 0 ? rgb : TONES[f[3]];
+        var k = 0.38 + 0.62*Math.max(0, dot(n, L)); if(f[4]) k *= 0.93;
+        var spec = Math.pow(Math.max(0, dot(n, norm([L[0], L[1], L[2]+1]))), 24) * 40;
+        var col = "rgb(" + Math.min(255, Math.round(base[0]*k + spec)) + "," + Math.min(255, Math.round(base[1]*k + spec)) + "," + Math.min(255, Math.round(base[2]*k + spec)) + ")";
+        var A = P[f[0]], B = P[f[1]], C = P[f[2]];
+        ctx.beginPath(); ctx.moveTo(A[3],A[4]); ctx.lineTo(B[3],B[4]); ctx.lineTo(C[3],C[4]); ctx.closePath();
+        ctx.fillStyle = col; ctx.fill(); ctx.strokeStyle = col; ctx.lineWidth = 0.6; ctx.stroke();
+      });
+    }
+    function reduced(){ try{ return window.matchMedia("(prefers-reduced-motion: reduce)").matches; }catch(e){ return false; } }
+    // view(canvas, name, {color, spin, drag, yaw, pitch})
+    function view(canvas, name, opt){
+      opt = opt || {};
+      var ctx = canvas.getContext && canvas.getContext("2d"); if(!ctx) return {setColor:function(){}, setModel:function(){}, destroy:function(){}};
+      var m = model(name), rgb = hexRgb(opt.color), yaw = opt.yaw != null ? opt.yaw : -0.6, pitch = opt.pitch != null ? opt.pitch : 0.32;
+      var spin = !!opt.spin && !reduced(), dragging = false, lastX = 0, lastY = 0, visible = true, raf = 0, dead = false, idleUntil = 0, W = 0, H = 0;
+      function size(){ var dpr = Math.min(window.devicePixelRatio || 1, 2); W = canvas.clientWidth || 300; H = canvas.clientHeight || 300; canvas.width = Math.round(W*dpr); canvas.height = Math.round(H*dpr); ctx.setTransform(dpr,0,0,dpr,0,0); }
+      function render(){ draw(ctx, W, H, m, yaw, pitch, rgb, opt.scale); }
+      function loop(t){ raf = 0; if(dead) return; if(spin && visible && !dragging && t > idleUntil) yaw += 0.012; render(); if((spin || dragging) && visible) raf = requestAnimationFrame(loop); }
+      function kick(){ if(!raf && !dead) raf = requestAnimationFrame(loop); }
+      size(); render(); kick();
+      var ro = null; try{ ro = new ResizeObserver(function(){ size(); render(); }); ro.observe(canvas); }catch(e){}
+      var io = null; try{ io = new IntersectionObserver(function(es){ visible = es[0].isIntersecting; if(visible) kick(); }); io.observe(canvas); }catch(e){}
+      if(opt.drag){
+        canvas.style.touchAction = "none"; canvas.style.cursor = "grab";
+        canvas.addEventListener("pointerdown", function(e){ dragging = true; lastX = e.clientX; lastY = e.clientY; try{ canvas.setPointerCapture(e.pointerId); }catch(err){} canvas.style.cursor = "grabbing"; kick(); });
+        canvas.addEventListener("pointermove", function(e){ if(!dragging) return; yaw += (e.clientX - lastX) * 0.012; pitch = Math.max(-0.4, Math.min(1.1, pitch + (e.clientY - lastY) * 0.008)); lastX = e.clientX; lastY = e.clientY; render(); });
+        var up = function(){ if(!dragging) return; dragging = false; idleUntil = performance.now() + 1800; canvas.style.cursor = "grab"; kick(); };
+        canvas.addEventListener("pointerup", up); canvas.addEventListener("pointercancel", up);
+      }
+      return {
+        setColor:function(hex){ rgb = hexRgb(hex); render(); },
+        setModel:function(n){ m = model(n); render(); },
+        hover:function(on){ if(reduced()) return; spin = on; if(on) kick(); },
+        destroy:function(){ dead = true; if(raf) cancelAnimationFrame(raf); try{ ro && ro.disconnect(); io && io.disconnect(); }catch(e){} }
+      };
+    }
+    return {view:view, model:model};
+  })();
 
   // ---------- catalog ----------
   function renderGrid(){
-    var g = $("grid"); g.textContent = "";
+    var g = $("grid"); cardViews.forEach(function(v){ v.destroy(); }); cardViews = []; g.textContent = "";
     var ids = sortedIds(products, false);
     if(!ids.length){ g.appendChild(el("p","empty","المنتجات بتنزل قريب.")); return; }
     ids.forEach(function(id){
       var p = products[id];
       var c = el("article","card");
-      var ph = el("div","ph"); artFor(p, ph); c.appendChild(ph);
+      var ph = el("div","ph"); c.appendChild(ph); var cvw = art3D(p, ph); if(cvw) cardViews.push(cvw);
       var b = el("div","body");
       if(p.personal) b.appendChild(el("span","tag","بالاسم"));
       else if(p.custom) b.appendChild(el("span","tag","تصميمك"));
@@ -527,9 +696,9 @@ footer .wrap{display:flex; justify-content:space-between; gap:12px; flex-wrap:wr
   }
 
   // ---------- order sheet ----------
-  var cur = null, pick = {color:"", size:"", qty:1}, lastFocus = null;
+  var cur = null, pick = {color:"", size:"", qty:1}, lastFocus = null, sheetView = null;
   function openSheet(sheet){ lastFocus = document.activeElement; $("scrim").hidden = false; sheet.hidden = false; document.body.style.overflow = "hidden"; setTimeout(function(){ var f = sheet.querySelector("input,button.x"); if(f) f.focus(); }, 60); }
-  function closeSheets(){ $("scrim").hidden = true; $("sheet").hidden = true; $("psheet").hidden = true; document.body.style.overflow = ""; if(lastFocus && lastFocus.focus) lastFocus.focus(); }
+  function closeSheets(){ if(sheetView){ sheetView.destroy(); sheetView = null; } $("scrim").hidden = true; $("sheet").hidden = true; $("psheet").hidden = true; document.body.style.overflow = ""; if(lastFocus && lastFocus.focus) lastFocus.focus(); }
   $("scrim").addEventListener("click", closeSheets);
   $("sh-close").addEventListener("click", closeSheets);
   $("ps-close").addEventListener("click", closeSheets);
@@ -539,6 +708,11 @@ footer .wrap{display:flex; justify-content:space-between; gap:12px; flex-wrap:wr
     cur = id; var p = products[id];
     pick = {color: p.colors.length === 1 ? p.colors[0] : "", size: p.sizes.length === 1 ? p.sizes[0] : "", qty:1};
     $("sh-title").textContent = p.name; artFor(p, $("sh-thumb"));
+    if(sheetView){ sheetView.destroy(); sheetView = null; }
+    var vw = $("viewer"); vw.textContent = "";
+    if(p.photo){ var im = el("img"); im.src = p.photo; im.alt = p.name; vw.appendChild(im); }
+    else { var cv = el("canvas"); cv.setAttribute("role","img"); cv.setAttribute("aria-label", p.name + "، اسحبه عشان تلفه"); vw.appendChild(cv); vw.appendChild(el("span","hint","اسحب عشان تلف"));
+      setTimeout(function(){ sheetView = M3.view(cv, p.art || "custom", {color: pick.color ? COLOR[pick.color].hex : firstHex(p), spin:true, drag:true, scale:0.4}); }, 30); }
     $("sh-form").hidden = false; $("sh-done").hidden = true;
     $("f-color").hidden = !p.colors.length; $("f-size").hidden = !p.sizes.length;
     $("f-text").hidden = !p.personal; $("o-text-lbl").textContent = p.personalLabel || "النص اللي ينطبع"; $("o-text").value = "";
@@ -554,7 +728,7 @@ footer .wrap{display:flex; justify-content:space-between; gap:12px; flex-wrap:wr
     p.colors.forEach(function(cid){
       var c = COLOR[cid], b = el("button","sw"); b.type = "button"; b.setAttribute("aria-pressed", pick.color === cid ? "true" : "false");
       var i = el("i"); i.style.background = c.hex; b.appendChild(i); b.appendChild(el("span","",c.name));
-      b.addEventListener("click", function(){ pick.color = cid; renderPickers(); });
+      b.addEventListener("click", function(){ pick.color = cid; if(sheetView) sheetView.setColor(c.hex); renderPickers(); });
       sw.appendChild(b);
     });
     sz.textContent = "";
@@ -860,6 +1034,13 @@ footer .wrap{display:flex; justify-content:space-between; gap:12px; flex-wrap:wr
   }
   async function boot(){
     products = normProducts(DEFAULTS); renderGrid();
+    var hv = M3.view($("hero3d"), "vase", {color:"#ff6a1a", spin:true, drag:true, pitch:0.28});
+    var hc = $("hero-cols");
+    ["orange","purple","blue","green","pink","gold","white","black"].forEach(function(id, i){
+      var b = el("button"); b.type = "button"; b.style.background = COLOR[id].hex; b.title = COLOR[id].name; b.setAttribute("aria-label", COLOR[id].name); b.setAttribute("aria-pressed", i === 0 ? "true" : "false");
+      b.addEventListener("click", function(){ hv.setColor(COLOR[id].hex); Array.from(hc.children).forEach(function(x){ x.setAttribute("aria-pressed", x === b ? "true" : "false"); }); });
+      hc.appendChild(b);
+    });
     var params = new URLSearchParams(location.search), key = params.get("admin");
     if(key){ try{ isAdmin = (await sha(key)) === ADMIN_HASH; }catch(e){ isAdmin = false; } }
     await loadProducts(); renderGrid();
