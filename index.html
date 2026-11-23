@@ -823,6 +823,7 @@ body.setup-mode .wrap > section:not(#setup), body.setup-mode .wrap > .foot, body
     dbRef.saveMine(data).then(function(){
       hydrated = true; st.textContent = "تمّت المهمة! تقدر تعدّل أي وقت.";
       celebrate(wasNew, data.name);
+      if(!isOwner) notifyHost(data, wasNew);
       nudgeEdited = false; showNudge(true);
     }).catch(function(e){
       st.textContent = "ما قدرنا نحفظ أجوبتك الحين. انسخها وأرسلها في القروب، أو جرّب بعد شوي.";
@@ -966,6 +967,23 @@ body.setup-mode .wrap > section:not(#setup), body.setup-mode .wrap > .foot, body
     deleteResponse: async function(id){ if(!isOwner) throw new Error("not host"); await fbDel("responses/" + encodeURIComponent(id)); applyState(await fetchState()); },
     setPlan: async function(p){ if(!isOwner) throw new Error("not host"); await fbPut("plan", p); applyState(await fetchState()); }
   };
+  // ---- Phone alert to the host via ntfy.sh ----
+  var NTFY_TOPIC = "talaa-e59b204dc1887a726d93";
+  function notifyHost(data, wasNew){
+    try{
+      var parts = [];
+      [["places","وين"],["dates","متى"],["times","الوقت"],["acts","النشاط"]].forEach(function(c){
+        var v = arr(data[c[0]]).map(function(x){ return labelOf(c[0], x); });
+        if(v.length) parts.push(c[1] + ": " + v.join("، "));
+      });
+      if(data.note) parts.push("ملاحظة: " + String(data.note).slice(0,120));
+      var link = location.origin + location.pathname + "?db=" + encodeURIComponent(FB.replace("https://","")) + "&g=" + encodeURIComponent(gid);
+      fetch("https://ntfy.sh/", {method:"POST", headers:{"Content-Type":"application/json"}, keepalive:true,
+        body: JSON.stringify({topic:NTFY_TOPIC, title:(wasNew ? String(data.name).slice(0,40) + " جاوب على مهمة الطلعة" : String(data.name).slice(0,40) + " عدّل جوابه"), message:parts.join("\n") || "سلّم المهمة", tags:["trophy"], click:link})
+      }).catch(function(){});
+    }catch(e){}
+  }
+
   async function poll(){ try{ applyState(await fetchState()); }catch(e){} }
 
   function copyFrom(inputId, statusEl){
