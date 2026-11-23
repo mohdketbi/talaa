@@ -1,0 +1,197 @@
+<!doctype html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>أحبك</title>
+<meta name="description" content="رسالة صغيرة">
+<meta property="og:title" content="لك">
+<meta property="og:description" content="افتحها">
+<meta name="theme-color" content="#0c0a12">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Cpath d='M32 56S6 40 6 22a13 13 0 0 1 26-4 13 13 0 0 1 26 4c0 18-26 34-26 34z' fill='%23ff3d77'/%3E%3C/svg%3E">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Lemonada:wght@500;700&family=Tajawal:wght@500;700&display=swap" rel="stylesheet">
+<style>
+/* Neon sign on a dark brick wall. A warm-white neon "good morning" flickers on letter by letter, then switches off; pink neon "أحبك" tubes light up one by one forever while outlined neon hearts drift. Deliberately single-theme dark. */
+:root{
+  color-scheme:dark;
+  --wall:#0c0a12; --brick:#16121d; --mortar:#0a080e;
+  --warm:#fff1d6; --warmglow:#ffb347; --pink:#ff4fa3; --pinkglow:#ff2d8a; --blue:#53d8ff; --violet:#b07cff; --dim:#5a4a62; --text:#f5ecff;
+  --font-neon:"Lemonada","Tajawal","Segoe UI",Tahoma,sans-serif;
+  --font-ui:"Tajawal","Segoe UI",Tahoma,sans-serif;
+}
+*{box-sizing:border-box}
+html,body{height:100%; margin:0}
+body{
+  direction:rtl; color:var(--text); font-family:var(--font-ui); overflow:hidden; -webkit-tap-highlight-color:transparent; user-select:none; -webkit-user-select:none;
+  background-color:var(--wall);
+  background-image:
+    radial-gradient(ellipse at 50% 45%, rgba(255,79,163,.10), transparent 60%),
+    linear-gradient(var(--mortar) 2px, transparent 2px),
+    linear-gradient(90deg, var(--mortar) 2px, transparent 2px),
+    linear-gradient(90deg, var(--mortar) 2px, transparent 2px);
+  background-size:100% 100%, 100% 44px, 88px 88px, 88px 88px;
+  background-position:0 0, 0 0, 0 0, 44px 44px;
+}
+body::after{content:""; position:fixed; inset:0; pointer-events:none; background:radial-gradient(ellipse at 50% 50%, transparent 35%, rgba(0,0,0,.65) 100%)}
+body.love{background-image:
+    radial-gradient(ellipse at 50% 45%, rgba(255,79,163,.22), transparent 62%),
+    linear-gradient(var(--mortar) 2px, transparent 2px),
+    linear-gradient(90deg, var(--mortar) 2px, transparent 2px),
+    linear-gradient(90deg, var(--mortar) 2px, transparent 2px)}
+.sky,.sun,.big-heart{display:none}
+canvas{position:fixed; inset:0; width:100%; height:100%; display:block}
+.stage{position:fixed; inset:0; display:grid; place-items:center; padding:calc(24px + env(safe-area-inset-top,0px)) max(20px, env(safe-area-inset-right,0px)) calc(24px + env(safe-area-inset-bottom,0px)) max(20px, env(safe-area-inset-left,0px)); text-align:center; pointer-events:none; z-index:2}
+.line{grid-area:1/1; font-family:var(--font-neon); font-weight:700; line-height:1.5; margin:0}
+#morning{font-size:clamp(2.2rem, 11vw, 4.6rem); max-width:12ch; color:var(--warm);
+  text-shadow:0 0 4px #fff, 0 0 10px var(--warm), 0 0 22px var(--warmglow), 0 0 44px var(--warmglow), 0 0 80px rgba(255,179,71,.6);
+  transition:opacity .25s ease}
+#morning .ch{display:inline; animation:on .5s steps(1) both}
+#morning.gone{animation:off 1.1s steps(1) forwards}
+#morning .caret{display:none}
+@keyframes on{0%{opacity:0} 20%{opacity:1} 30%{opacity:.25} 45%{opacity:1} 55%{opacity:.5} 70%,100%{opacity:1}}
+@keyframes off{0%{opacity:1} 15%{opacity:.2} 25%{opacity:1} 40%{opacity:.1} 50%{opacity:.8} 65%,100%{opacity:0}}
+#forever{width:min(100%, 760px); font-size:clamp(2.3rem, 12vw, 4.8rem); opacity:0}
+body.love #forever{opacity:1}
+#lv{display:flex; flex-wrap:wrap; justify-content:center; align-content:center; gap:.15em .45em; min-height:4.8em}
+#lv .w{display:inline-block; padding:0 .12em; color:#ffe6f3; border:3px solid rgba(255,79,163,.0); border-radius:.4em;
+  text-shadow:0 0 4px #fff, 0 0 10px var(--pink), 0 0 22px var(--pinkglow), 0 0 44px var(--pinkglow), 0 0 70px rgba(255,45,138,.7);
+  animation:on .7s steps(1) both, hum 3.2s ease-in-out .7s infinite}
+#lv .w:nth-child(3n+2){color:#e9fbff; text-shadow:0 0 4px #fff, 0 0 10px var(--blue), 0 0 22px var(--blue), 0 0 44px #1ba8ff, 0 0 70px rgba(27,168,255,.7)}
+#lv .w:nth-child(3n){color:#f3eaff; text-shadow:0 0 4px #fff, 0 0 10px var(--violet), 0 0 22px var(--violet), 0 0 44px #8a4dff, 0 0 70px rgba(138,77,255,.7)}
+#lv .w.out{animation:off .6s steps(1) forwards}
+@keyframes hum{0%,100%{filter:brightness(1)} 50%{filter:brightness(1.18)} 92%{filter:brightness(1)} 94%{filter:brightness(.6)} 96%{filter:brightness(1.1)}}
+.hint{position:fixed; left:0; right:0; bottom:calc(18px + env(safe-area-inset-bottom,0px)); text-align:center; font-size:.95rem; font-weight:700; color:var(--dim); opacity:0; transition:opacity 1s ease; pointer-events:none; z-index:3}
+body.love .hint{opacity:1; transition-delay:3.2s}
+.again{position:fixed; z-index:3; top:calc(14px + env(safe-area-inset-top,0px)); left:max(14px, env(safe-area-inset-left,0px)); border:1px solid rgba(255,79,163,.6); background:rgba(12,10,18,.6); color:#ffd2e8; font:inherit; font-weight:700; font-size:.9rem; padding:7px 14px; border-radius:999px; cursor:pointer; opacity:0; transition:opacity 1s ease; box-shadow:0 0 12px rgba(255,79,163,.35)}
+body.love .again{opacity:1; transition-delay:3.6s}
+.again:focus-visible{outline:2px solid #fff; outline-offset:3px}
+.sr{position:absolute; width:1px; height:1px; overflow:hidden; clip:rect(0 0 0 0)}
+@media (prefers-reduced-motion: reduce){
+  #morning .ch, #lv .w{animation:none}
+  #morning.gone, #lv .w.out{animation:none; opacity:0}
+}
+</style>
+</head>
+<body class="dawn-start">
+<div class="sky dawn" aria-hidden="true"></div>
+<div class="sky night" aria-hidden="true"></div>
+<div class="sun" aria-hidden="true"></div>
+<canvas id="c" aria-hidden="true"></canvas>
+<svg class="big-heart" viewBox="0 0 120 110" aria-hidden="true"><path d="M60 100 C22 74 6 54 6 33 C6 17 18 6 33 6 C45 6 55 13 60 24 C65 13 75 6 87 6 C102 6 114 17 114 33 C114 54 98 74 60 100 Z"/></svg>
+
+<main class="stage">
+  <h1 class="sr">صباح الخير حبيبي، أحبك أحبك أحبك</h1>
+  <p class="line" id="morning" aria-hidden="true"></p>
+  <div class="line" id="forever" aria-hidden="true"><div id="lv"></div></div>
+</main>
+<p class="hint" aria-hidden="true">المس الشاشة</p>
+<button type="button" class="again" id="again">مرة ثانية</button>
+
+<script>
+(function(){
+  "use strict";
+  var body = document.body, morning = document.getElementById("morning");
+  var reduce = false; try{ reduce = window.matchMedia("(prefers-reduced-motion: reduce)").matches; }catch(e){}
+  var timers = [];
+  function later(fn, ms){ timers.push(setTimeout(fn, ms)); }
+
+  // ---- hearts ----
+  var cv = document.getElementById("c"), ctx = cv.getContext("2d"), W = 0, H = 0, dpr = 1, hearts = [], mode = "dawn";
+  function size(){ dpr = Math.min(window.devicePixelRatio || 1, 2); W = innerWidth; H = innerHeight; cv.width = W*dpr; cv.height = H*dpr; ctx.setTransform(dpr,0,0,dpr,0,0); }
+  size(); addEventListener("resize", size);
+  var DAWN = ["#fff1d6","#ffb347"], NIGHT = ["#ff4fa3","#53d8ff","#b07cff","#ff4fa3"];
+  function heartPath(s){
+    ctx.beginPath();
+    ctx.moveTo(0, s*0.32);
+    ctx.bezierCurveTo(-s*0.9, -s*0.25, -s*0.45, -s*0.95, 0, -s*0.45);
+    ctx.bezierCurveTo(s*0.45, -s*0.95, s*0.9, -s*0.25, 0, s*0.32);
+    ctx.closePath();
+  }
+  function spawnFloat(){
+    var cols = mode === "love" ? NIGHT : DAWN;
+    if(mode === "love" && Math.random() < 0.16){
+      hearts.push({x:40 + Math.random()*(W-80), y:H + 30, vx:0, vy:-(0.5 + Math.random()*0.7), s:16 + Math.random()*18, a:0, life:1, wob:Math.random()*6, c:cols[Math.floor(Math.random()*cols.length)], burst:false, word:true});
+      return;
+    }
+    hearts.push({x:Math.random()*W, y:H + 30, vx:(Math.random()-.5)*.3, vy:-(0.4 + Math.random()*0.9), s:8 + Math.random()*(mode === "love" ? 22 : 12), a:0, life:1, wob:Math.random()*6, c:cols[Math.floor(Math.random()*cols.length)], burst:false});
+  }
+  function burst(x, y, n){
+    for(var i = 0; i < n; i++){
+      var ang = Math.random()*Math.PI*2, sp = 2 + Math.random()*6;
+      hearts.push({x:x, y:y, vx:Math.cos(ang)*sp, vy:Math.sin(ang)*sp - 2, s:7 + Math.random()*16, a:1, life:1, wob:Math.random()*6, c:NIGHT[i % NIGHT.length], burst:true});
+    }
+  }
+  var acc = 0, last = performance.now();
+  function frame(t){
+    var dt = Math.min(50, t - last); last = t;
+    acc += dt * (mode === "love" ? 0.009 : 0.005);
+    while(acc > 1){ spawnFloat(); acc -= 1; }
+    ctx.clearRect(0,0,W,H);
+    for(var i = hearts.length - 1; i >= 0; i--){
+      var h = hearts[i];
+      if(h.burst){ h.vy += 0.12; h.vx *= 0.985; h.life -= 0.011; h.a = Math.max(0, h.life); }
+      else { h.wob += 0.03; h.x += h.vx + Math.sin(h.wob)*0.4; h.a = Math.min(h.word ? 0.5 : 0.85, h.a + 0.02); if(h.y < H*0.25) h.a *= 0.985; }
+      h.x += h.burst ? h.vx : 0; h.y += h.vy;
+      if(h.y < -40 || h.life <= 0 || h.a < 0.02 && h.y < H*0.3){ hearts.splice(i,1); continue; }
+      ctx.save(); ctx.translate(h.x, h.y); ctx.rotate(Math.sin(h.wob)*0.25); ctx.globalAlpha = h.a;
+      ctx.shadowColor = h.c; ctx.shadowBlur = 14; ctx.strokeStyle = h.c; ctx.lineWidth = 2.2; ctx.lineJoin = "round";
+      ctx.fillStyle = h.c;
+      if(h.word){ ctx.font = "700 " + Math.round(h.s) + "px 'Lemonada', 'Tajawal', sans-serif"; ctx.textAlign = "center"; ctx.direction = "rtl"; ctx.lineWidth = 1.2; ctx.strokeText("أحبك", 0, 0); }
+      else { heartPath(h.s); ctx.stroke(); }
+      ctx.restore();
+    }
+    if(hearts.length > 400) hearts.splice(0, hearts.length - 400);
+    requestAnimationFrame(frame);
+  }
+  if(!reduce) requestAnimationFrame(frame);
+
+  addEventListener("pointerdown", function(e){ if(e.target.id === "again") return; if(!reduce) burst(e.clientX, e.clientY, mode === "love" ? 26 : 12); });
+
+  // ---- story ----
+  var TEXT = "صباح الخير حبيبي";
+  function typeText(done){
+    var chars = Array.from(TEXT), i = 0;
+    morning.textContent = ""; var span = document.createElement("span"), caret = document.createElement("span");
+    caret.className = "caret"; morning.appendChild(span); morning.appendChild(caret);
+    if(reduce){ span.textContent = TEXT; later(done, 1500); return; }
+    (function step(){
+      i++; span.textContent = chars.slice(0, i).join(""); span.className = "ch"; span.style.animation = "none"; void span.offsetWidth; span.style.animation = "";
+      if(i < chars.length) later(step, chars[i-1] === " " ? 230 : 120 + Math.random()*70);
+      else later(function(){ caret.remove(); done(); }, 1400);
+    })();
+  }
+  var lv = document.getElementById("lv"), MAXW = 9;
+  function loveLoop(){
+    var w = document.createElement("span"); w.className = "w"; w.textContent = "أحبك";
+    lv.appendChild(w);
+    var live = lv.querySelectorAll(".w:not(.out)");
+    if(live.length > MAXW){ var old = live[0]; old.classList.add("out"); setTimeout(function(){ old.remove(); }, 600); }
+    if(!reduce){ var r = w.getBoundingClientRect(); burst(r.left + r.width/2, r.top + r.height/2, 8); }
+    later(loveLoop, reduce ? 1400 : 650);
+  }
+  function play(){
+    timers.forEach(clearTimeout); timers = []; lv.textContent = "";
+    hearts = []; mode = "dawn";
+    body.className = "";
+    morning.classList.remove("gone");
+    void body.offsetWidth;
+    later(function(){ body.classList.add("morning"); }, 60);
+    later(function(){
+      typeText(function(){
+        morning.classList.add("gone");
+        later(function(){
+          mode = "love"; body.classList.remove("morning"); body.classList.add("love");
+          later(loveLoop, 300);
+          if(!reduce){ burst(W/2, H/2, 70); later(function(){ burst(W*0.25, H*0.35, 30); burst(W*0.75, H*0.4, 30); }, 700); }
+        }, 1100);
+      });
+    }, 700);
+  }
+  document.getElementById("again").addEventListener("click", play);
+  play();
+})();
+</script>
+</body>
+</html>
